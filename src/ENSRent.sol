@@ -52,9 +52,9 @@ contract ENSRent is ERC721Holder {
     }
 
     function listDomain(uint256 tokenId, uint256 pricePerSecond, uint256 maxEndTimestamp, bytes32 nameNode) external {
-        require(pricePerSecond > 0, "Price must be greater than 0");
-        require(maxEndTimestamp > block.timestamp, "Max end time must be in the future");
-        require(maxEndTimestamp < ensNFT.nameExpires(tokenId), "Max end time must be after name expires");
+        if (pricePerSecond == 0) revert ZeroPriceNotAllowed();
+        if (maxEndTimestamp <= block.timestamp) revert MaxEndTimeMustBeFuture();
+        if (maxEndTimestamp >= ensNFT.nameExpires(tokenId)) revert MaxEndTimeExceedsExpiry();
 
         ensNFT.safeTransferFrom(msg.sender, address(this), tokenId);
         ensNFT.reclaim(tokenId, address(this));
@@ -73,14 +73,14 @@ contract ENSRent is ERC721Holder {
 
     function rentDomain(uint256 tokenId, uint256 desiredEndTimestamp) external payable {
         RentalTerms storage terms = rentalTerms[tokenId];
-        require(terms.lender != address(0), "Domain not listed");
-        require(desiredEndTimestamp <= terms.maxEndTimestamp, "Requested end time exceeds maximum allowed");
-        require(desiredEndTimestamp > block.timestamp, "End time must be in the future");
-        require(terms.currentBorrower == address(0) || block.timestamp >= terms.rentalEnd, "Domain currently rented");
+        if (terms.lender == address(0)) revert DomainNotListed();
+        if (desiredEndTimestamp > terms.maxEndTimestamp) revert ExceedsMaxEndTime();
+        if (desiredEndTimestamp <= block.timestamp) revert EndTimeMustBeFuture();
+        if (terms.currentBorrower != address(0) && block.timestamp < terms.rentalEnd) revert DomainCurrentlyRented();
 
         uint256 duration = desiredEndTimestamp - block.timestamp;
         uint256 totalPrice = terms.pricePerSecond * duration;
-        require(msg.value >= totalPrice, "Insufficient payment");
+        if (msg.value < totalPrice) revert InsufficientPayment();
 
         ensRegistry.setOwner(terms.nameNode, msg.sender);
 
@@ -100,8 +100,8 @@ contract ENSRent is ERC721Holder {
 
     function reclaimDomain(uint256 tokenId) external {
         RentalTerms storage terms = rentalTerms[tokenId];
-        require(msg.sender == terms.lender, "Only lender can reclaim");
-        require(block.timestamp >= terms.rentalEnd, "Active rental period");
+        if (msg.sender != terms.lender) revert NotLender();
+        if (block.timestamp < terms.rentalEnd) revert ActiveRentalPeriod();
 
         ensRegistry.setOwner(terms.nameNode, terms.lender);
         ensNFT.safeTransferFrom(address(this), terms.lender, tokenId);
@@ -113,9 +113,9 @@ contract ENSRent is ERC721Holder {
 
     function recoverExpiredRental(uint256 tokenId) external {
         RentalTerms storage terms = rentalTerms[tokenId];
-        require(terms.lender != address(0), "Domain not listed");
-        require(terms.currentBorrower != address(0), "No active rental");
-        require(block.timestamp >= terms.rentalEnd, "Rental not expired");
+        if (terms.lender == address(0)) revert DomainNotListed();
+        if (terms.currentBorrower == address(0)) revert NoActiveRental();
+        if (block.timestamp < terms.rentalEnd) revert RentalNotExpired();
 
         ensNFT.reclaim(tokenId, address(this));
 
