@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
 import "./interfaces/IENSRegistry.sol";
+import "./interfaces/IBaseRegistrar.sol";
 
 contract ENSRent is ERC721Holder {
-    IERC721 public immutable ensNFT;
+    IBaseRegistrar public immutable ensNFT;
     IENSRegistry public immutable ensRegistry;
 
     struct RentalTerms {
@@ -35,7 +35,7 @@ contract ENSRent is ERC721Holder {
     error EtherTransferFailed();
 
     constructor(address _ensNFTAddress, address _ensRegistryAddress) {
-        ensNFT = IERC721(_ensNFTAddress);
+        ensNFT = IBaseRegistrar(_ensNFTAddress);
         ensRegistry = IENSRegistry(_ensRegistryAddress);
     }
 
@@ -48,9 +48,10 @@ contract ENSRent is ERC721Holder {
     function listDomain(uint256 tokenId, uint256 pricePerSecond, uint256 maxEndTimestamp, bytes32 nameNode) external {
         require(pricePerSecond > 0, "Price must be greater than 0");
         require(maxEndTimestamp > block.timestamp, "Max end time must be in the future");
+        require(maxEndTimestamp < ensNFT.nameExpires(tokenId), "Max end time must be after name expires");
 
         ensNFT.safeTransferFrom(msg.sender, address(this), tokenId);
-        ensRegistry.setOwner(nameNode, address(this));
+        ensNFT.reclaim(tokenId, address(this));
 
         rentalTerms[tokenId] = RentalTerms({
             lender: msg.sender,
@@ -110,7 +111,7 @@ contract ENSRent is ERC721Holder {
         require(terms.currentBorrower != address(0), "No active rental");
         require(block.timestamp >= terms.rentalEnd, "Rental not expired");
 
-        ensRegistry.setOwner(terms.nameNode, address(this));
+        ensNFT.reclaim(tokenId, address(this));
 
         terms.currentBorrower = address(0);
         terms.rentalEnd = 0;
