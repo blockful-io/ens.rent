@@ -39,6 +39,12 @@ contract ENSRent is ERC721Holder {
         ensRegistry = IENSRegistry(_ensRegistryAddress);
     }
 
+
+    /// @notice Name must be and ERC-721, before the NameWrapper
+    /// @param tokenId The tokenId of the ENS name to list
+    /// @param pricePerSecond The price per second to rent the name
+    /// @param maxEndTimestamp The maximum end timestamp for the rental
+    /// @param nameNode The node of the ENS name to list
     function listDomain(uint256 tokenId, uint256 pricePerSecond, uint256 maxEndTimestamp, bytes32 nameNode) external {
         require(pricePerSecond > 0, "Price must be greater than 0");
         require(maxEndTimestamp > block.timestamp, "Max end time must be in the future");
