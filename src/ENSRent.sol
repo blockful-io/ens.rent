@@ -35,6 +35,7 @@ contract ENSRent is ERC721Holder, ERC1155Holder {
         address currentBorrower;
         uint256 rentalEnd;
         bytes32 nameNode;
+        uint256 tokenId;
     }
 
     /// @notice Mapping from tokenId to rental terms
@@ -140,7 +141,8 @@ contract ENSRent is ERC721Holder, ERC1155Holder {
             maxEndTimestamp: maxEndTimestamp,
             currentBorrower: address(0),
             rentalEnd: 0,
-            nameNode: nameNode
+            nameNode: nameNode,
+            tokenId: tokenId
         });
 
         emit DomainListed(tokenId, msg.sender, pricePerSecond, maxEndTimestamp, nameNode);
@@ -197,7 +199,7 @@ contract ENSRent is ERC721Holder, ERC1155Holder {
         if (block.timestamp < terms.rentalEnd) revert ActiveRentalPeriod();
 
         // Return ENS name control to lender
-        ensRegistry.setOwner(terms.nameNode, terms.lender);
+        baseRegistrar.reclaim(terms.tokenId, terms.lender);
         baseRegistrar.safeTransferFrom(address(this), terms.lender, tokenId);
 
         delete rentalTerms[tokenId];
