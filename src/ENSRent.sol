@@ -21,7 +21,6 @@ contract ENSRental is ERC721Holder, ReentrancyGuard, Ownable {
         uint256 maxEndTimestamp;
         address currentBorrower;
         uint256 rentalEnd;
-        bool isActive;
         bytes32 nameNode;
     }
     
@@ -30,6 +29,7 @@ contract ENSRental is ERC721Holder, ReentrancyGuard, Ownable {
     event DomainListed(uint256 indexed tokenId, address indexed lender, uint256 pricePerSecond, uint256 maxEndTimestamp, bytes32 nameNode);
     event DomainRented(uint256 indexed tokenId, address indexed borrower, uint256 rentalEnd, uint256 totalPrice);
     event DomainReclaimed(uint256 indexed tokenId, address indexed lender);
+    event RentalTermsUpdated(uint256 indexed tokenId, uint256 newPricePerSecond, uint256 newMaxEndTimestamp);
     
     error EtherTransferFailed();
     
@@ -56,7 +56,6 @@ contract ENSRental is ERC721Holder, ReentrancyGuard, Ownable {
             maxEndTimestamp: maxEndTimestamp,
             currentBorrower: address(0),
             rentalEnd: 0,
-            isActive: true,
             nameNode: nameNode
         });
         
@@ -65,7 +64,7 @@ contract ENSRental is ERC721Holder, ReentrancyGuard, Ownable {
     
     function rentDomain(uint256 tokenId, uint256 desiredEndTimestamp) external payable nonReentrant {
         RentalTerms storage terms = rentalTerms[tokenId];
-        require(terms.isActive, "Domain not available for rent");
+        require(terms.lender != address(0), "Domain not listed");
         require(desiredEndTimestamp <= terms.maxEndTimestamp, "Requested end time exceeds maximum allowed");
         require(desiredEndTimestamp > block.timestamp, "End time must be in the future");
         require(terms.currentBorrower == address(0) || block.timestamp >= terms.rentalEnd, "Domain currently rented");
@@ -79,11 +78,9 @@ contract ENSRental is ERC721Holder, ReentrancyGuard, Ownable {
         terms.currentBorrower = msg.sender;
         terms.rentalEnd = desiredEndTimestamp;
         
-        // Transfer payment to lender
         (bool sent,) = payable(terms.lender).call{value: totalPrice}("");
         if (!sent) revert EtherTransferFailed();
         
-        // Refund excess payment if any
         if (msg.value > totalPrice) {
             (bool refundSent,) = payable(msg.sender).call{value: msg.value - totalPrice}("");
             if (!refundSent) revert EtherTransferFailed();
@@ -100,16 +97,14 @@ contract ENSRental is ERC721Holder, ReentrancyGuard, Ownable {
         ensRegistry.setOwner(terms.nameNode, terms.lender);
         ensNFT.safeTransferFrom(address(this), terms.lender, tokenId);
         
-        terms.isActive = false;
-        terms.currentBorrower = address(0);
-        terms.rentalEnd = 0;
+        delete rentalTerms[tokenId];
         
         emit DomainReclaimed(tokenId, terms.lender);
     }
     
     function recoverExpiredRental(uint256 tokenId) external {
         RentalTerms storage terms = rentalTerms[tokenId];
-        require(terms.isActive, "Domain not listed");
+        require(terms.lender != address(0), "Domain not listed");
         require(terms.currentBorrower != address(0), "No active rental");
         require(block.timestamp >= terms.rentalEnd, "Rental not expired");
         
@@ -119,14 +114,12 @@ contract ENSRental is ERC721Holder, ReentrancyGuard, Ownable {
         terms.rentalEnd = 0;
     }
     
-    
     function getRentalTerms(uint256 tokenId) external view returns (
         address lender,
         uint256 pricePerSecond,
         uint256 maxEndTimestamp,
         address currentBorrower,
         uint256 rentalEnd,
-        bool isActive,
         bytes32 nameNode
     ) {
         RentalTerms storage terms = rentalTerms[tokenId];
@@ -136,9 +129,7 @@ contract ENSRental is ERC721Holder, ReentrancyGuard, Ownable {
             terms.maxEndTimestamp,
             terms.currentBorrower,
             terms.rentalEnd,
-            terms.isActive,
             terms.nameNode
         );
     }
-
 }
