@@ -13,7 +13,7 @@ contract ENSRental is ERC721Holder, ReentrancyGuard, Ownable {
     struct RentalTerms {
         address lender;
         uint256 pricePerSecond;
-        uint256 maxDuration;
+        uint256 maxEndTimestamp;  // The maximum timestamp until which the domain can be rented
         address currentBorrower;
         uint256 rentalEnd;
         bool isActive;
@@ -23,10 +23,10 @@ contract ENSRental is ERC721Holder, ReentrancyGuard, Ownable {
     mapping(uint256 => RentalTerms) public rentalTerms;
     
     // Events
-    event DomainListed(uint256 indexed tokenId, address indexed lender, uint256 pricePerSecond, uint256 maxDuration);
+    event DomainListed(uint256 indexed tokenId, address indexed lender, uint256 pricePerSecond, uint256 maxEndTimestamp);
     event DomainRented(uint256 indexed tokenId, address indexed borrower, uint256 rentalEnd, uint256 totalPrice);
     event DomainReclaimed(uint256 indexed tokenId, address indexed lender);
-    event RentalTermsUpdated(uint256 indexed tokenId, uint256 newPricePerSecond, uint256 newMaxDuration);
+    event RentalTermsUpdated(uint256 indexed tokenId, uint256 newPricePerSecond, uint256 newMaxEndTimestamp);
     
     constructor(address _ensNFTAddress) {
         ensNFT = IERC721(_ensNFTAddress);
@@ -35,10 +35,10 @@ contract ENSRental is ERC721Holder, ReentrancyGuard, Ownable {
     function listDomain(
         uint256 tokenId,
         uint256 pricePerSecond,
-        uint256 maxDuration
+        uint256 maxEndTimestamp
     ) external {
         require(pricePerSecond > 0, "Price must be greater than 0");
-        require(maxDuration > 0, "Max duration must be greater than 0");
+        require(maxEndTimestamp > block.timestamp, "Max end time must be in the future");
         
         // Transfer the ENS NFT to this contract
         ensNFT.safeTransferFrom(msg.sender, address(this), tokenId);
@@ -46,31 +46,29 @@ contract ENSRental is ERC721Holder, ReentrancyGuard, Ownable {
         rentalTerms[tokenId] = RentalTerms({
             lender: msg.sender,
             pricePerSecond: pricePerSecond,
-            maxDuration: maxDuration,
+            maxEndTimestamp: maxEndTimestamp,
             currentBorrower: address(0),
             rentalEnd: 0,
             isActive: true
         });
         
-        emit DomainListed(tokenId, msg.sender, pricePerSecond, maxDuration);
+        emit DomainListed(tokenId, msg.sender, pricePerSecond, maxEndTimestamp);
     }
     
-    function rentDomain(uint256 tokenId, uint256 duration) external payable nonReentrant {
+    function rentDomain(uint256 tokenId, uint256 desiredEndTimestamp) external payable nonReentrant {
         RentalTerms storage terms = rentalTerms[tokenId];
         require(terms.isActive, "Domain not available for rent");
-        require(duration <= terms.maxDuration, "Duration exceeds maximum allowed");
-        require(duration > 0, "Duration must be greater than 0");
+        require(desiredEndTimestamp <= terms.maxEndTimestamp, "Requested end time exceeds maximum allowed");
+        require(desiredEndTimestamp > block.timestamp, "End time must be in the future");
         require(terms.currentBorrower == address(0) || block.timestamp >= terms.rentalEnd, "Domain currently rented");
         
+        uint256 duration = desiredEndTimestamp - block.timestamp;
         uint256 totalPrice = terms.pricePerSecond * duration;
         require(msg.value >= totalPrice, "Insufficient payment");
         
-        // Calculate rental end time
-        uint256 rentalEnd = block.timestamp + duration;
-        
         // Update rental terms
         terms.currentBorrower = msg.sender;
-        terms.rentalEnd = rentalEnd;
+        terms.rentalEnd = desiredEndTimestamp;
         
         // Transfer payment to lender
         payable(terms.lender).transfer(totalPrice);
@@ -80,7 +78,7 @@ contract ENSRental is ERC721Holder, ReentrancyGuard, Ownable {
             payable(msg.sender).transfer(msg.value - totalPrice);
         }
         
-        emit DomainRented(tokenId, msg.sender, rentalEnd, totalPrice);
+        emit DomainRented(tokenId, msg.sender, desiredEndTimestamp, totalPrice);
     }
     
     function reclaimDomain(uint256 tokenId) external {
@@ -102,24 +100,24 @@ contract ENSRental is ERC721Holder, ReentrancyGuard, Ownable {
     function updateRentalTerms(
         uint256 tokenId,
         uint256 newPricePerSecond,
-        uint256 newMaxDuration
+        uint256 newMaxEndTimestamp
     ) external {
         RentalTerms storage terms = rentalTerms[tokenId];
         require(msg.sender == terms.lender, "Only lender can update terms");
         require(terms.currentBorrower == address(0) || block.timestamp >= terms.rentalEnd, "Active rental period");
         require(newPricePerSecond > 0, "Price must be greater than 0");
-        require(newMaxDuration > 0, "Max duration must be greater than 0");
+        require(newMaxEndTimestamp > block.timestamp, "Max end time must be in the future");
         
         terms.pricePerSecond = newPricePerSecond;
-        terms.maxDuration = newMaxDuration;
+        terms.maxEndTimestamp = newMaxEndTimestamp;
         
-        emit RentalTermsUpdated(tokenId, newPricePerSecond, newMaxDuration);
+        emit RentalTermsUpdated(tokenId, newPricePerSecond, newMaxEndTimestamp);
     }
     
     function getRentalTerms(uint256 tokenId) external view returns (
         address lender,
         uint256 pricePerSecond,
-        uint256 maxDuration,
+        uint256 maxEndTimestamp,
         address currentBorrower,
         uint256 rentalEnd,
         bool isActive
@@ -128,7 +126,7 @@ contract ENSRental is ERC721Holder, ReentrancyGuard, Ownable {
         return (
             terms.lender,
             terms.pricePerSecond,
-            terms.maxDuration,
+            terms.maxEndTimestamp,
             terms.currentBorrower,
             terms.rentalEnd,
             terms.isActive
@@ -137,6 +135,8 @@ contract ENSRental is ERC721Holder, ReentrancyGuard, Ownable {
     
     function isAvailableForRent(uint256 tokenId) external view returns (bool) {
         RentalTerms storage terms = rentalTerms[tokenId];
-        return terms.isActive && (terms.currentBorrower == address(0) || block.timestamp >= terms.rentalEnd);
+        return terms.isActive && 
+               (terms.currentBorrower == address(0) || block.timestamp >= terms.rentalEnd) &&
+               block.timestamp < terms.maxEndTimestamp;
     }
 }
