@@ -32,19 +32,25 @@ contract ENSRent is ERC721Holder {
     event DomainReclaimed(uint256 indexed tokenId, address indexed lender);
     event RentalTermsUpdated(uint256 indexed tokenId, uint256 newPricePerSecond, uint256 newMaxEndTimestamp);
 
+    error ZeroPriceNotAllowed();
+    error MaxEndTimeMustBeFuture();
+    error MaxEndTimeExceedsExpiry();
+    error DomainNotListed();
+    error ExceedsMaxEndTime();
+    error EndTimeMustBeFuture();
+    error DomainCurrentlyRented();
+    error InsufficientPayment();
     error EtherTransferFailed();
+    error NotLender();
+    error ActiveRentalPeriod();
+    error NoActiveRental();
+    error RentalNotExpired();
 
     constructor(address _ensNFTAddress, address _ensRegistryAddress) {
         ensNFT = IBaseRegistrar(_ensNFTAddress);
         ensRegistry = IENSRegistry(_ensRegistryAddress);
     }
 
-
-    /// @notice Name must be and ERC-721, before the NameWrapper
-    /// @param tokenId The tokenId of the ENS name to list
-    /// @param pricePerSecond The price per second to rent the name
-    /// @param maxEndTimestamp The maximum end timestamp for the rental
-    /// @param nameNode The node of the ENS name to list
     function listDomain(uint256 tokenId, uint256 pricePerSecond, uint256 maxEndTimestamp, bytes32 nameNode) external {
         require(pricePerSecond > 0, "Price must be greater than 0");
         require(maxEndTimestamp > block.timestamp, "Max end time must be in the future");

@@ -36,19 +36,36 @@ receive() external payable {}
     }
 
     function test_listDomain() public {
-
         vm.startPrank(nameOwner);
+
         baseRegistrar.approve(address(ensRent), tokenId);
 
         ensRent.listDomain(tokenId, 1, block.timestamp + 1 days, nameNode);
 
-        console.log("ENS Registry owner of nameNode: %s", ensRegistry.owner(nameNode));
         vm.stopPrank();
+    }
 
+    function test_listDomain_ShouldRevert_When_MaxEndTimeExceedsExpiry() public {
+        vm.startPrank(nameOwner);
 
+        baseRegistrar.approve(address(ensRent), tokenId);
 
-        ensRent.rentDomain{value: 1 ether}(tokenId, block.timestamp + 1 days);
-        console.log("ENS Registry owner of nameNode: %s", ensRegistry.owner(nameNode));
+        vm.expectRevert(ENSRent.MaxEndTimeExceedsExpiry.selector);
+        ensRent.listDomain(tokenId, 1, block.timestamp + 1000 weeks, nameNode);
 
+        vm.stopPrank();
+    }
+
+    function test_rentDomain() public {
+        test_listDomain();
+
+        ensRent.rentDomain{ value: 1 ether }(tokenId, block.timestamp + 1 days);
+    }
+
+    function test_rentDomain_ShouldRevert_When_ExceedsMaxEndTime() public {
+        test_listDomain();
+
+        vm.expectRevert(ENSRent.ExceedsMaxEndTime.selector);
+        ensRent.rentDomain{ value: 1 ether }(tokenId, block.timestamp + 100 weeks);
     }
 }
