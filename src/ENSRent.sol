@@ -2,13 +2,16 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 
 import "./interfaces/IENSRegistry.sol";
 import "./interfaces/IBaseRegistrar.sol";
+import "./interfaces/INameWrapper.sol";
 
-contract ENSRent is ERC721Holder {
-    IBaseRegistrar public immutable ensNFT;
+contract ENSRent is ERC721Holder, ERC1155Holder {
+    IBaseRegistrar public immutable baseRegistrar;
     IENSRegistry public immutable ensRegistry;
+    INameWrapper public immutable nameWrapper;
 
     struct RentalTerms {
         address lender;
@@ -46,18 +49,26 @@ contract ENSRent is ERC721Holder {
     error NoActiveRental();
     error RentalNotExpired();
 
-    constructor(address _ensNFTAddress, address _ensRegistryAddress) {
-        ensNFT = IBaseRegistrar(_ensNFTAddress);
+    constructor(address _nameWrapper, address _baseRegistrarAddress, address _ensRegistryAddress) {
+        nameWrapper = INameWrapper(_nameWrapper);
+        baseRegistrar = IBaseRegistrar(_baseRegistrarAddress);
         ensRegistry = IENSRegistry(_ensRegistryAddress);
     }
 
     function listDomain(uint256 tokenId, uint256 pricePerSecond, uint256 maxEndTimestamp, bytes32 nameNode) external {
         if (pricePerSecond == 0) revert ZeroPriceNotAllowed();
         if (maxEndTimestamp <= block.timestamp) revert MaxEndTimeMustBeFuture();
-        if (maxEndTimestamp >= ensNFT.nameExpires(tokenId)) revert MaxEndTimeExceedsExpiry();
+        if (maxEndTimestamp >= baseRegistrar.nameExpires(tokenId)) revert MaxEndTimeExceedsExpiry();
 
-        ensNFT.safeTransferFrom(msg.sender, address(this), tokenId);
-        ensNFT.reclaim(tokenId, address(this));
+        if (baseRegistrar.ownerOf(tokenId) == address(nameWrapper)) {
+            // ENS is wrapped
+            nameWrapper.safeTransferFrom(msg.sender, address(this), uint256(nameNode), 1, "");
+
+            nameWrapper.unwrapETH2LD(bytes32(tokenId), address(this), address(this));
+        } else {
+            baseRegistrar.safeTransferFrom(msg.sender, address(this), tokenId);
+            baseRegistrar.reclaim(tokenId, address(this));
+        }
 
         rentalTerms[tokenId] = RentalTerms({
             lender: msg.sender,
@@ -73,6 +84,7 @@ contract ENSRent is ERC721Holder {
 
     function rentDomain(uint256 tokenId, uint256 desiredEndTimestamp) external payable {
         RentalTerms storage terms = rentalTerms[tokenId];
+
         if (terms.lender == address(0)) revert DomainNotListed();
         if (desiredEndTimestamp > terms.maxEndTimestamp) revert ExceedsMaxEndTime();
         if (desiredEndTimestamp <= block.timestamp) revert EndTimeMustBeFuture();
@@ -80,6 +92,7 @@ contract ENSRent is ERC721Holder {
 
         uint256 duration = desiredEndTimestamp - block.timestamp;
         uint256 totalPrice = terms.pricePerSecond * duration;
+        
         if (msg.value < totalPrice) revert InsufficientPayment();
 
         ensRegistry.setOwner(terms.nameNode, msg.sender);
@@ -104,7 +117,7 @@ contract ENSRent is ERC721Holder {
         if (block.timestamp < terms.rentalEnd) revert ActiveRentalPeriod();
 
         ensRegistry.setOwner(terms.nameNode, terms.lender);
-        ensNFT.safeTransferFrom(address(this), terms.lender, tokenId);
+        baseRegistrar.safeTransferFrom(address(this), terms.lender, tokenId);
 
         delete rentalTerms[tokenId];
 
@@ -117,7 +130,7 @@ contract ENSRent is ERC721Holder {
         if (terms.currentBorrower == address(0)) revert NoActiveRental();
         if (block.timestamp < terms.rentalEnd) revert RentalNotExpired();
 
-        ensNFT.reclaim(tokenId, address(this));
+        baseRegistrar.reclaim(tokenId, address(this));
 
         terms.currentBorrower = address(0);
         terms.rentalEnd = 0;
