@@ -87,11 +87,11 @@ contract ENSRent is ERC721Holder {
         terms.currentBorrower = msg.sender;
         terms.rentalEnd = desiredEndTimestamp;
 
-        (bool sent,) = payable(terms.lender).call{value: totalPrice}("");
+        (bool sent,) = payable(terms.lender).call{ value: totalPrice }("");
         if (!sent) revert EtherTransferFailed();
 
         if (msg.value > totalPrice) {
-            (bool refundSent,) = payable(msg.sender).call{value: msg.value - totalPrice}("");
+            (bool refundSent,) = payable(msg.sender).call{ value: msg.value - totalPrice }("");
             if (!refundSent) revert EtherTransferFailed();
         }
 

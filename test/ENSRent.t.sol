@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Test, console} from "forge-std/Test.sol";
-import {ENSRent} from "@src/ENSRent.sol";
-import {IBaseRegistrar} from "@src/interfaces/IBaseRegistrar.sol";
-import {IENSRegistry} from "@src/interfaces/IENSRegistry.sol";
-
+import { Test, console } from "forge-std/Test.sol";
+import { ENSRent } from "@src/ENSRent.sol";
+import { IBaseRegistrar } from "@src/interfaces/IBaseRegistrar.sol";
+import { IENSRegistry } from "@src/interfaces/IENSRegistry.sol";
 
 contract ENSRentTest is Test {
     ENSRent public ensRent;
@@ -16,10 +15,10 @@ contract ENSRentTest is Test {
     address public nameOwner;
     bytes32 public nameNode;
 
-receive() external payable {}
+    receive() external payable { }
 
     function setUp() public {
-        vm.createSelectFork({ blockNumber: 7088658, urlOrAlias: "sepolia" });
+        vm.createSelectFork({ blockNumber: 7_088_658, urlOrAlias: "sepolia" });
 
         ensRegistry = IENSRegistry(0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e);
         baseRegistrar = IBaseRegistrar(0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85);
