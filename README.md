@@ -32,6 +32,11 @@ A smart contract system that enables ENS domain owners to rent out their domains
 - Automatic return of domain control
 - Clear rental terms tracking
 
+### Ideas
+- [ ] Rental ownership through NFT
+- [ ] Protocol fees
+- [ ] Dynamic auction parameters
+
 ## Technical Details
 
 ### Contract Architecture
@@ -39,6 +44,20 @@ The system consists of three main components:
 1. Base Registrar Interface (ERC721)
 2. Name Wrapper Interface (ERC1155)
 3. ENS Registry Interface
+
+### Commands
+
+#### Lend and Borrow
+Change the domain name in the script to the desired domain and set the private key in the .env file.
+```bash
+forge script script/lendAndBorrow.s.sol \
+    --rpc-url sepolia \
+    -vvvvv \
+    --chain 11155111 \
+    --verify \
+    --broadcast \
+    --slow
+```
 
 ### Key Structs
 

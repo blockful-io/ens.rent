@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import { Test, console } from "forge-std/Test.sol";
+import { Test, console } from "@forge-std/Test.sol";
 import { ENSRent } from "@src/ENSRent.sol";
 import { IBaseRegistrar } from "@src/interfaces/IBaseRegistrar.sol";
 import { IENSRegistry } from "@src/interfaces/IENSRegistry.sol";
@@ -47,7 +47,7 @@ contract ENSRentTest is Test {
     function test_listDomain() public {
         vm.startPrank(nameOwner);
         _approveENS();
-        ensRent.listDomain(tokenId, 1, block.timestamp + 1 days, nameNode);
+        ensRent.listDomain(tokenId, 1, block.timestamp + 1 days, nameNode, name);
         vm.stopPrank();
 
         (address lender,,,,, bytes32 node,) = ensRent.rentalTerms(tokenId);
@@ -60,7 +60,7 @@ contract ENSRentTest is Test {
         _approveENS();
         
         vm.expectRevert(ENSRent.ZeroPriceNotAllowed.selector);
-        ensRent.listDomain(tokenId, 0, block.timestamp + 1 days, nameNode);
+        ensRent.listDomain(tokenId, 0, block.timestamp + 1 days, nameNode, name);
         vm.stopPrank();
     }
 
@@ -69,7 +69,7 @@ contract ENSRentTest is Test {
         _approveENS();
         
         vm.expectRevert(ENSRent.MaxEndTimeMustBeFuture.selector);
-        ensRent.listDomain(tokenId, 1, block.timestamp - 1, nameNode);
+        ensRent.listDomain(tokenId, 1, block.timestamp - 1, nameNode, name);
         vm.stopPrank();
     }
 
@@ -78,7 +78,7 @@ contract ENSRentTest is Test {
         _approveENS();
         
         vm.expectRevert(ENSRent.MaxEndTimeExceedsExpiry.selector);
-        ensRent.listDomain(tokenId, 1, block.timestamp + 1000 weeks, nameNode);
+        ensRent.listDomain(tokenId, 1, block.timestamp + 1000 weeks, nameNode, name);
         vm.stopPrank();
     }
 
@@ -86,7 +86,7 @@ contract ENSRentTest is Test {
         vm.startPrank(RANDOM_USER);
         
         vm.expectRevert("ERC721: caller is not token owner or approved");
-        ensRent.listDomain(tokenId, 1, block.timestamp + 1 days, nameNode);
+        ensRent.listDomain(tokenId, 1, block.timestamp + 1 days, nameNode, name);
         vm.stopPrank();
     }
 

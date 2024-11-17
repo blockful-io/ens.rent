@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import { Script } from "forge-std/Script.sol";
-import { console } from "forge-std/Console.sol";
+import { Script } from "@forge-std/Script.sol";
+import { console } from "@forge-std/Console.sol";
 import { ENSRent } from "../src/ENSRent.sol";
 import { IBaseRegistrar } from "../src/interfaces/IBaseRegistrar.sol";
 import { IENSRegistry } from "../src/interfaces/IENSRegistry.sol";
