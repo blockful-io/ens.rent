@@ -14,7 +14,7 @@ import "./interfaces/INameWrapper.sol";
  * @notice ENS domain rental contract with Dutch auction mechanism
  * @dev Implements rental functionality for both wrapped (ERC1155) and unwrapped (ERC721) ENS names
  *      Features Dutch auctions that start at domain listing and after each rental expiry
- *      Prices decay from 0.01 ETH/second to a minimum price set by the domain owner
+ *      Prices decay to a minimum price set by the domain owner
  */
 contract ENSRent is ERC721Holder, ERC1155Holder {
     /**
@@ -39,19 +39,19 @@ contract ENSRent is ERC721Holder, ERC1155Holder {
      * @notice Duration of each Dutch auction in seconds
      * @dev After this period, price stabilizes at minPricePerSecond
      */
-    uint256 public constant AUCTION_DURATION = 7 days;
+    uint256 public immutable AUCTION_DURATION;
 
     /**
      * @notice Initial price per second in Dutch auction
      * @dev Price decays from this value to minPricePerSecond over AUCTION_DURATION
      */
-    uint256 public constant STARTING_PRICE_PER_SECOND = 1 gwei;
+    uint256 public immutable STARTING_PRICE_PER_SECOND;
 
     /**
      * @notice Decay rate denominator for price calculation
      * @dev Higher value = slower price decay. Used in quadratic decay formula
      */
-    uint256 public constant DECAY_RATE = 1000;
+    uint256 public immutable DECAY_RATE;
 
     /**
      * @notice Storage structure for domain rental information
@@ -189,12 +189,18 @@ contract ENSRent is ERC721Holder, ERC1155Holder {
      * @param _nameWrapper Address of ENS NameWrapper contract
      * @param _baseRegistrarAddress Address of ENS BaseRegistrar contract
      * @param _ensRegistryAddress Address of ENS Registry contract
+     * @param _auctionDuration Duration of each Dutch auction in seconds
+     * @param _startingPricePerSecond Initial price per second in Dutch auction
+     * @param _decayRate Decay rate denominator for price calculation
      * @dev Sets up immutable contract references
      */
-    constructor(address _nameWrapper, address _baseRegistrarAddress, address _ensRegistryAddress) {
+    constructor(address _nameWrapper, address _baseRegistrarAddress, address _ensRegistryAddress, uint256 _auctionDuration, uint256 _startingPricePerSecond, uint256 _decayRate) {
         nameWrapper = INameWrapper(_nameWrapper);
         baseRegistrar = IBaseRegistrar(_baseRegistrarAddress);
         ensRegistry = IENSRegistry(_ensRegistryAddress);
+        AUCTION_DURATION = _auctionDuration;
+        STARTING_PRICE_PER_SECOND = _startingPricePerSecond;
+        DECAY_RATE = _decayRate;
     }
 
     /**
