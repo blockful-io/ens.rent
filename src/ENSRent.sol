@@ -12,10 +12,8 @@ import { IENSRent } from "./interfaces/IENSRent.sol";
  * @title ENSRent
  * @author Alex Netto (@alextnetto)
  * @author Lucas Picollo (@pikonha)
- * @notice ENS domain rental contract with Dutch auction mechanism
+ * @notice ENS domain rental contract with a fixed price per second
  * @dev Implements rental functionality for both wrapped (ERC1155) and unwrapped (ERC721) ENS names
- *      Features Dutch auctions that start at domain listing and after each rental expiry
- *      Prices decay to a minimum price set by the domain owner
  */
 contract ENSRent is IENSRent, ERC721Holder, ERC1155Holder {
     /**
@@ -29,24 +27,6 @@ contract ENSRent is IENSRent, ERC721Holder, ERC1155Holder {
      * @dev Used for ERC1155 transfers and wrapped domain management
      */
     INameWrapper public immutable nameWrapper;
-
-    /**
-     * @notice Duration of each Dutch auction in seconds
-     * @dev After this period, price stabilizes at minPricePerSecond
-     */
-    uint256 public immutable AUCTION_DURATION;
-
-    /**
-     * @notice Initial price per second in Dutch auction
-     * @dev Price decays from this value to minPricePerSecond over AUCTION_DURATION
-     */
-    uint256 public immutable STARTING_PRICE_PER_SECOND;
-
-    /**
-     * @notice Decay rate denominator for price calculation
-     * @dev Higher value = slower price decay. Used in quadratic decay formula
-     */
-    uint256 public immutable DECAY_RATE;
 
     /**
      * @notice Storage structure for domain rental information
@@ -78,23 +58,11 @@ contract ENSRent is IENSRent, ERC721Holder, ERC1155Holder {
      * @notice Initialize the rental contract
      * @param _nameWrapper Address of ENS NameWrapper contract
      * @param _baseRegistrarAddress Address of ENS BaseRegistrar contract
-     * @param _auctionDuration Duration of each Dutch auction in seconds
-     * @param _startingPricePerSecond Initial price per second in Dutch auction
-     * @param _decayRate Decay rate denominator for price calculation
      * @dev Sets up immutable contract references
      */
-    constructor(
-        address _nameWrapper,
-        address _baseRegistrarAddress,
-        uint256 _auctionDuration,
-        uint256 _startingPricePerSecond,
-        uint256 _decayRate
-    ) {
+    constructor(address _nameWrapper, address _baseRegistrarAddress) {
         nameWrapper = INameWrapper(_nameWrapper);
         baseRegistrar = IBaseRegistrar(_baseRegistrarAddress);
-        AUCTION_DURATION = _auctionDuration;
-        STARTING_PRICE_PER_SECOND = _startingPricePerSecond;
-        DECAY_RATE = _decayRate;
     }
 
     /**

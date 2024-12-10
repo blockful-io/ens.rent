@@ -13,8 +13,6 @@ contract ENSRentScript is Script {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
 
-        ensRent = new ENSRent(
-            0x0635513f179D50A207757E05759CbD106d7dFcE8, 0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85, 7 days, 1 gwei, 1000
-        );
+        ensRent = new ENSRent(0x0635513f179D50A207757E05759CbD106d7dFcE8, 0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85);
     }
 }
