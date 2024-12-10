@@ -34,7 +34,8 @@ contract ENSRentTest is Test {
         baseRegistrar = IBaseRegistrar(0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85);
         ensRegistry = IENSRegistry(0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e);
 
-        ensRent = new ENSRent(address(nameWrapper), address(baseRegistrar), 10 seconds, 1 gwei, 1000);
+        ensRent =
+            new ENSRent(address(nameWrapper), address(baseRegistrar), address(ensRegistry), 10 seconds, 10 wei, 1000);
         name = "testinggg";
         nameOwner = address(0x76A6D08b82034b397E7e09dAe4377C18F132BbB8);
 
