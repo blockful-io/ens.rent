@@ -195,10 +195,8 @@ contract ENSRent is IENSRent, ERC721Holder, ERC1155Holder {
             if (block.timestamp < terms.maxEndTimestamp) handleRentalEnd(tokenId);
         }
 
-        // Calculate rental cost at current auction price
-        uint256 pricePerSecond = _getCurrentPrice(terms);
         uint256 duration = desiredEndTimestamp - block.timestamp;
-        uint256 totalPrice = pricePerSecond * duration;
+        uint256 totalPrice = terms.minPricePerSecond * duration;
 
         // Verify payment
         if (msg.value < totalPrice) revert InsufficientPayment();
