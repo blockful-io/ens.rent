@@ -91,7 +91,14 @@ contract ENSRent is IENSRent, ERC721Holder, ERC1155Holder {
      * @param _decayRate Decay rate denominator for price calculation
      * @dev Sets up immutable contract references
      */
-    constructor(address _nameWrapper, address _baseRegistrarAddress, address _ensRegistryAddress, uint256 _auctionDuration, uint256 _startingPricePerSecond, uint256 _decayRate) {
+    constructor(
+        address _nameWrapper,
+        address _baseRegistrarAddress,
+        address _ensRegistryAddress,
+        uint256 _auctionDuration,
+        uint256 _startingPricePerSecond,
+        uint256 _decayRate
+    ) {
         nameWrapper = INameWrapper(_nameWrapper);
         baseRegistrar = IBaseRegistrar(_baseRegistrarAddress);
         ensRegistry = IENSRegistry(_ensRegistryAddress);
@@ -243,7 +250,7 @@ contract ENSRent is IENSRent, ERC721Holder, ERC1155Holder {
      * @param tokenId Domain's ERC721 token ID
      * @dev Can only be called after rental period ends
      */
-    function reclaimDomain(uint256 tokenId) public {
+    function reclaimDomain(uint256 tokenId) external {
         RentalTerms storage terms = rentalTerms[tokenId];
 
         // Validate reclaim request
