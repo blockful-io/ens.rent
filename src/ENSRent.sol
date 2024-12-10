@@ -199,7 +199,6 @@ contract ENSRent is IENSRent, ERC721Holder, ERC1155Holder {
         if (desiredEndTimestamp <= block.timestamp) revert EndTimeMustBeFuture();
         if (terms.currentBorrower != address(0)) {
             if (block.timestamp < terms.rentalEnd) revert DomainCurrentlyRented();
-            if (block.timestamp < terms.maxEndTimestamp) handleRentalEnd(tokenId);
         }
 
         // Calculate rental cost at current auction price
@@ -234,7 +233,7 @@ contract ENSRent is IENSRent, ERC721Holder, ERC1155Holder {
      * @notice Returns the ownership to the Rent contract to be rented again
      * @param tokenId Domain's ERC721 token ID
      */
-    function handleRentalEnd(uint256 tokenId) public {
+    function handleRentalEnd(uint256 tokenId) external {
         RentalTerms storage terms = rentalTerms[tokenId];
 
         if (terms.lender == address(0) || block.timestamp > terms.maxEndTimestamp) revert DomainNotListed();
