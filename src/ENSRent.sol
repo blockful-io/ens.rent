@@ -4,19 +4,21 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 
-import "./interfaces/IENSRegistry.sol";
-import "./interfaces/IBaseRegistrar.sol";
-import "./interfaces/INameWrapper.sol";
+import { IENSRegistry } from "./interfaces/IENSRegistry.sol";
+import { IBaseRegistrar } from "./interfaces/IBaseRegistrar.sol";
+import { INameWrapper } from "./interfaces/INameWrapper.sol";
+import { IENSRent } from "./interfaces/IENSRent.sol";
 
 /**
  * @title ENSRent
- * @author Alex Netto
+ * @author Alex Netto (@alextnetto)
+ * @author Lucas Picollo (@pikonha)
  * @notice ENS domain rental contract with Dutch auction mechanism
  * @dev Implements rental functionality for both wrapped (ERC1155) and unwrapped (ERC721) ENS names
  *      Features Dutch auctions that start at domain listing and after each rental expiry
  *      Prices decay to a minimum price set by the domain owner
  */
-contract ENSRent is ERC721Holder, ERC1155Holder {
+contract ENSRent is IENSRent, ERC721Holder, ERC1155Holder {
     /**
      * @notice The ENS base registrar contract for managing .eth domains
      * @dev Used for handling ERC721 transfers and domain management
@@ -78,111 +80,6 @@ contract ENSRent is ERC721Holder, ERC1155Holder {
      * @dev Primary storage for rental information
      */
     mapping(uint256 => RentalTerms) public rentalTerms;
-
-    /**
-     * @notice Emitted when a domain is listed for rent
-     * @param tokenId Domain's ERC721 token ID
-     * @param lender Domain owner's address
-     * @param minPricePerSecond Floor price for rentals
-     * @param maxEndTimestamp Latest allowed rental end time
-     * @param nameNode Domain's namehash
-     * @dev Triggered in listDomain function when domain is first listed
-     */
-    event DomainListed(
-        string name,
-        uint256 indexed tokenId,
-        address indexed lender,
-        uint256 minPricePerSecond,
-        uint256 maxEndTimestamp,
-        bytes32 nameNode
-    );
-
-    /**
-     * @notice Emitted when a domain is rented
-     * @param tokenId Domain's ERC721 token ID
-     * @param borrower Renter's address
-     * @param rentalEnd Rental end timestamp
-     * @param totalPrice Total price paid for rental
-     * @param pricePerSecond Rate paid per second
-     * @dev Includes actual price paid from Dutch auction
-     */
-    event DomainRented(
-        uint256 indexed tokenId, address indexed borrower, uint256 rentalEnd, uint256 totalPrice, uint256 pricePerSecond
-    );
-
-    /**
-     * @notice Emitted when owner reclaims their domain
-     * @param tokenId Domain's ERC721 token ID
-     * @param lender Owner's address
-     * @dev Only emitted after rental period ends
-     */
-    event DomainReclaimed(uint256 indexed tokenId, address indexed lender);
-
-    /**
-     * @notice Minimum price must be greater than zero
-     * @dev Thrown in listDomain when minPricePerSecond = 0
-     */
-    error ZeroPriceNotAllowed();
-
-    /**
-     * @notice Maximum rental end time must be future timestamp
-     * @dev Thrown when maxEndTimestamp <= current time
-     */
-    error MaxEndTimeMustBeFuture();
-
-    /**
-     * @notice Maximum end time cannot exceed domain expiry
-     * @dev Ensures domain doesn't expire during rental period
-     */
-    error MaxEndTimeExceedsExpiry();
-
-    /**
-     * @notice Domain must be listed before renting
-     * @dev Thrown when attempting to rent unlisted domain
-     */
-    error DomainNotListed();
-
-    /**
-     * @notice Rental end time exceeds maximum allowed
-     * @dev Enforces owner-set maximum rental duration
-     */
-    error ExceedsMaxEndTime();
-
-    /**
-     * @notice Rental end time must be in the future
-     * @dev Basic timestamp validation
-     */
-    error EndTimeMustBeFuture();
-
-    /**
-     * @notice Cannot rent domain during active rental
-     * @dev Prevents overlapping rentals
-     */
-    error DomainCurrentlyRented();
-
-    /**
-     * @notice Payment must cover calculated rental cost
-     * @dev Ensures sufficient payment for desired duration
-     */
-    error InsufficientPayment();
-
-    /**
-     * @notice ETH transfer failed
-     * @dev Safety check for ETH transfers
-     */
-    error EtherTransferFailed();
-
-    /**
-     * @notice Only domain owner can perform action
-     * @dev Access control for owner operations
-     */
-    error NotLender();
-
-    /**
-     * @notice Cannot reclaim during active rental
-     * @dev Protects renter's rights during rental period
-     */
-    error ActiveRentalPeriod();
 
     /**
      * @notice Initialize the rental contract
@@ -293,7 +190,10 @@ contract ENSRent is ERC721Holder, ERC1155Holder {
         if (terms.lender == address(0)) revert DomainNotListed();
         if (desiredEndTimestamp > terms.maxEndTimestamp) revert ExceedsMaxEndTime();
         if (desiredEndTimestamp <= block.timestamp) revert EndTimeMustBeFuture();
-        if (terms.currentBorrower != address(0) && block.timestamp < terms.rentalEnd) revert DomainCurrentlyRented();
+        if (terms.currentBorrower != address(0)) {
+            if (block.timestamp < terms.rentalEnd) revert DomainCurrentlyRented();
+            if (block.timestamp < terms.maxEndTimestamp) handleRentalEnd(tokenId);
+        }
 
         // Calculate rental cost at current auction price
         uint256 pricePerSecond = _getCurrentPrice(terms);
@@ -304,7 +204,7 @@ contract ENSRent is ERC721Holder, ERC1155Holder {
         if (msg.value < totalPrice) revert InsufficientPayment();
 
         // Transfer domain control
-        ensRegistry.setOwner(terms.nameNode, msg.sender);
+        baseRegistrar.reclaim(tokenId, msg.sender);
 
         // Update rental terms
         terms.currentBorrower = msg.sender;
@@ -320,7 +220,22 @@ contract ENSRent is ERC721Holder, ERC1155Holder {
             if (!refundSent) revert EtherTransferFailed();
         }
 
-        emit DomainRented(tokenId, msg.sender, desiredEndTimestamp, totalPrice, pricePerSecond);
+        emit DomainRented(tokenId, msg.sender, desiredEndTimestamp, totalPrice, terms.minPricePerSecond);
+    }
+
+    /**
+     * @notice Returns the ownership to the Rent contract to be rented again
+     * @param tokenId Domain's ERC721 token ID
+     */
+    function handleRentalEnd(uint256 tokenId) public {
+        RentalTerms storage terms = rentalTerms[tokenId];
+
+        if (terms.lender == address(0) || block.timestamp > terms.maxEndTimestamp) revert DomainNotListed();
+        if (block.timestamp < terms.rentalEnd) revert DomainCurrentlyRented();
+
+        baseRegistrar.reclaim(tokenId, address(this));
+        terms.currentBorrower = address(0);
+        terms.rentalEnd = 0;
     }
 
     /**
@@ -328,12 +243,12 @@ contract ENSRent is ERC721Holder, ERC1155Holder {
      * @param tokenId Domain's ERC721 token ID
      * @dev Can only be called after rental period ends
      */
-    function reclaimDomain(uint256 tokenId) external {
+    function reclaimDomain(uint256 tokenId) public {
         RentalTerms storage terms = rentalTerms[tokenId];
 
         // Validate reclaim request
         if (msg.sender != terms.lender) revert NotLender();
-        if (block.timestamp < terms.rentalEnd) revert ActiveRentalPeriod();
+        if (block.timestamp < terms.rentalEnd) revert DomainCurrentlyRented();
 
         // Return domain control
         baseRegistrar.reclaim(terms.tokenId, terms.lender);
