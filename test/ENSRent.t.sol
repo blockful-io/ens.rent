@@ -3,6 +3,7 @@ pragma solidity ^0.8.13;
 
 import { Test, console } from "@forge-std/Test.sol";
 
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ENSRent } from "@src/ENSRent.sol";
 import { IENSRent } from "@src/interfaces/IENSRent.sol";
 import { IBaseRegistrar } from "@src/interfaces/IBaseRegistrar.sol";
@@ -19,11 +20,14 @@ contract ENSRentTest is Test {
     string public name;
     address public nameOwner;
     bytes32 public nameNode;
+    address public ensRentOwner;
     bytes32 public ETH_NODE = keccak256(abi.encodePacked(bytes32(0), keccak256("eth")));
 
     // Test addresses
     address public constant RENTER = address(0x1);
     address public constant RANDOM_USER = address(0x2);
+
+    receive() external payable { }
 
     function setUp() public {
         vm.createSelectFork({ blockNumber: 7_088_658, urlOrAlias: "sepolia" });
@@ -32,7 +36,7 @@ contract ENSRentTest is Test {
         baseRegistrar = IBaseRegistrar(0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85);
         ensRegistry = IENSRegistry(0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e);
 
-        ensRent = new ENSRent(address(nameWrapper), address(baseRegistrar), 100); // 1% fee
+        ensRent = new ENSRent(address(nameWrapper), address(baseRegistrar), 100, address(this)); // 1% fee
         name = "testinggg";
         nameOwner = address(0x76A6D08b82034b397E7e09dAe4377C18F132BbB8);
 
@@ -356,6 +360,37 @@ contract ENSRentTest is Test {
         vm.startPrank(ensRent.owner());
         vm.expectRevert("Fee cannot exceed 10%");
         ensRent.setFeeBasisPoints(1011);
+        vm.stopPrank();
+    }
+
+    function test_setOwnerThroughConstructor() public {
+        address newOwner = address(0x123);
+        ENSRent newEnsRent = new ENSRent(address(nameWrapper), address(baseRegistrar), 100, newOwner);
+
+        assertEq(newEnsRent.owner(), newOwner);
+    }
+
+    function test_withdraw() public {
+        address newOwner = address(0x123);
+        ENSRent newEnsRent = new ENSRent(address(nameWrapper), address(baseRegistrar), 100, newOwner);
+        // vm.balance(address(newEnsRent), 1 ether);
+        vm.deal(address(newEnsRent), 1 ether);
+
+        uint256 balanceB4 = newOwner.balance;
+
+        // Withdraw as owner
+        vm.prank(newEnsRent.owner());
+        newEnsRent.withdraw();
+
+        // Verify owner received the fees
+        assertEq(address(newEnsRent).balance, 0);
+        assertEq(newOwner.balance, balanceB4 + 1 ether);
+    }
+
+    function test_withdraw_ShouldRevert_When_NotOwner() public {
+        vm.startPrank(RENTER);
+        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, RENTER));
+        ensRent.withdraw();
         vm.stopPrank();
     }
 

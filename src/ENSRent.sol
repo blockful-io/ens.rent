@@ -67,7 +67,14 @@ contract ENSRent is IENSRent, ERC721Holder, ERC1155Holder, Ownable {
      * @param _feeBasisPoints Fee percentage taken from rentals (100 = 1%)
      * @dev Sets up immutable contract references
      */
-    constructor(address _nameWrapper, address _baseRegistrarAddress, uint256 _feeBasisPoints) Ownable(msg.sender) {
+    constructor(
+        address _nameWrapper,
+        address _baseRegistrarAddress,
+        uint256 _feeBasisPoints,
+        address _owner
+    )
+        Ownable(_owner)
+    {
         nameWrapper = INameWrapper(_nameWrapper);
         baseRegistrar = IBaseRegistrar(_baseRegistrarAddress);
         _setFeeBasisPoints(_feeBasisPoints);
