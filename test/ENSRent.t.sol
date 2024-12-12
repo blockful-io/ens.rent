@@ -25,8 +25,6 @@ contract ENSRentTest is Test {
     address public constant RENTER = address(0x1);
     address public constant RANDOM_USER = address(0x2);
 
-    receive() external payable { }
-
     function setUp() public {
         vm.createSelectFork({ blockNumber: 7_088_658, urlOrAlias: "sepolia" });
 
@@ -34,7 +32,7 @@ contract ENSRentTest is Test {
         baseRegistrar = IBaseRegistrar(0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85);
         ensRegistry = IENSRegistry(0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e);
 
-        ensRent = new ENSRent(address(nameWrapper), address(baseRegistrar));
+        ensRent = new ENSRent(address(nameWrapper), address(baseRegistrar), 100); // 1% fee
         name = "testinggg";
         nameOwner = address(0x76A6D08b82034b397E7e09dAe4377C18F132BbB8);
 
@@ -302,6 +300,62 @@ contract ENSRentTest is Test {
 
         address currentOwner = ensRegistry.owner(nameNode);
         assertEq(currentOwner, nameOwner);
+        vm.stopPrank();
+    }
+
+    // Fee Tests
+    function test_feeCollection() public {
+        uint256 price = 10 wei;
+
+        // List domain with 10 wei per second price
+        vm.startPrank(nameOwner);
+        _approveENS();
+        ensRent.listDomain(tokenId, price, block.timestamp + 1 days, nameNode, name);
+        vm.stopPrank();
+
+        // Rent for 100 seconds
+        uint256 rentalDuration = 100;
+        uint256 feeBasisPoints = ensRent.feeBasisPoints();
+        uint256 totalPayment = price * rentalDuration;
+        uint256 expectedFee = (totalPayment * feeBasisPoints) / 10_000;
+        uint256 contractBalanceBefore = address(ensRent).balance;
+
+        vm.prank(RENTER);
+        ensRent.rentDomain{ value: totalPayment }(tokenId, block.timestamp + rentalDuration);
+
+        uint256 contractBalanceAfter = address(ensRent).balance;
+        assertEq(contractBalanceAfter - contractBalanceBefore, expectedFee);
+    }
+
+    function test_feeDistribution() public {
+        // List domain with 10 wei per second price
+        vm.startPrank(nameOwner);
+        _approveENS();
+        ensRent.listDomain(tokenId, 10 wei, block.timestamp + 1 days, nameNode, name);
+        vm.stopPrank();
+
+        // Rent for 100 seconds
+        uint256 rentalDuration = 100;
+        uint256 price = 10 wei;
+        uint256 totalPayment = price * rentalDuration;
+
+        uint256 balanceBefore = address(nameOwner).balance;
+
+        vm.prank(RENTER);
+        ensRent.rentDomain{ value: totalPayment }(tokenId, block.timestamp + rentalDuration);
+
+        uint256 balanceAfter = address(nameOwner).balance;
+        uint256 feeBasisPoints = ensRent.feeBasisPoints();
+        uint256 expectedFee = (totalPayment * feeBasisPoints) / 10_000;
+        uint256 expectedOwnerPayment = totalPayment - expectedFee;
+
+        assertEq(balanceAfter - balanceBefore, expectedOwnerPayment);
+    }
+
+    function test_setFeeBasisPoints_ShouldRevert_When_FeeExceedsTenPercent() public {
+        vm.startPrank(ensRent.owner());
+        vm.expectRevert("Fee cannot exceed 10%");
+        ensRent.setFeeBasisPoints(1011);
         vm.stopPrank();
     }
 

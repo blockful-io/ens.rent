@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
-import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
+import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import { ERC1155Holder } from "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 import { IBaseRegistrar } from "./interfaces/IBaseRegistrar.sol";
 import { INameWrapper } from "./interfaces/INameWrapper.sol";
@@ -15,7 +16,12 @@ import { IENSRent } from "./interfaces/IENSRent.sol";
  * @notice ENS domain rental contract with a fixed price per second
  * @dev Implements rental functionality for both wrapped (ERC1155) and unwrapped (ERC721) ENS names
  */
-contract ENSRent is IENSRent, ERC721Holder, ERC1155Holder {
+contract ENSRent is IENSRent, ERC721Holder, ERC1155Holder, Ownable {
+    /**
+     * @notice Fee percentage taken from rental payments
+     */
+    uint256 public feeBasisPoints;
+
     /**
      * @notice The ENS base registrar contract for managing .eth domains
      * @dev Used for handling ERC721 transfers and domain management
@@ -58,11 +64,13 @@ contract ENSRent is IENSRent, ERC721Holder, ERC1155Holder {
      * @notice Initialize the rental contract
      * @param _nameWrapper Address of ENS NameWrapper contract
      * @param _baseRegistrarAddress Address of ENS BaseRegistrar contract
+     * @param _feeBasisPoints Fee percentage taken from rentals (100 = 1%)
      * @dev Sets up immutable contract references
      */
-    constructor(address _nameWrapper, address _baseRegistrarAddress) {
+    constructor(address _nameWrapper, address _baseRegistrarAddress, uint256 _feeBasisPoints) Ownable(msg.sender) {
         nameWrapper = INameWrapper(_nameWrapper);
         baseRegistrar = IBaseRegistrar(_baseRegistrarAddress);
+        _setFeeBasisPoints(_feeBasisPoints);
     }
 
     /**
@@ -135,6 +143,10 @@ contract ENSRent is IENSRent, ERC721Holder, ERC1155Holder {
         // Verify payment
         if (msg.value < totalPrice) revert InsufficientPayment();
 
+        // Calculate fee
+        uint256 fee = (totalPrice * feeBasisPoints) / 10_000;
+        uint256 lenderPayment = totalPrice - fee;
+
         // Transfer domain control
         baseRegistrar.reclaim(tokenId, msg.sender);
 
@@ -143,7 +155,7 @@ contract ENSRent is IENSRent, ERC721Holder, ERC1155Holder {
         terms.rentalEnd = desiredEndTimestamp;
 
         // Transfer payment to domain owner
-        (bool sent,) = payable(terms.lender).call{ value: totalPrice }("");
+        (bool sent,) = payable(terms.lender).call{ value: lenderPayment }("");
         if (!sent) revert EtherTransferFailed();
 
         // Refund excess payment
@@ -190,5 +202,30 @@ contract ENSRent is IENSRent, ERC721Holder, ERC1155Holder {
         delete rentalTerms[tokenId];
 
         emit DomainReclaimed(tokenId, terms.lender);
+    }
+
+    /**
+     * @notice Update the fee percentage taken from rentals
+     * @param _feeBasisPoints New fee in basis points
+     * @dev Can only be called by contract owner
+     */
+    function setFeeBasisPoints(uint256 _feeBasisPoints) external onlyOwner {
+        _setFeeBasisPoints(_feeBasisPoints);
+    }
+
+    /**
+     * @notice Internal function to validate and set fee basis points
+     * @param _feeBasisPoints New fee in basis points
+     */
+    function _setFeeBasisPoints(uint256 _feeBasisPoints) private {
+        require(_feeBasisPoints <= 1000, "Fee cannot exceed 10%");
+        feeBasisPoints = _feeBasisPoints;
+    }
+
+    receive() external payable { }
+
+    function withdraw() external onlyOwner {
+        (bool sent,) = payable(owner()).call{ value: address(this).balance }("");
+        if (!sent) revert EtherTransferFailed();
     }
 }
