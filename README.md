@@ -1,110 +1,174 @@
-# 🏗 Scaffold-ETH 2
+# ENS Domain Rental Contract
 
-<h4 align="center">
-  <a href="https://docs.scaffoldeth.io">Documentation</a> |
-  <a href="https://scaffoldeth.io">Website</a>
-</h4>
+A smart contract system that enables ENS domain owners to rent out their domains for a specified duration. This contract supports both wrapped (ERC1155) and unwrapped (ERC721) ENS names.
 
-🧪 An open-source, up-to-date toolkit for building decentralized applications (dapps) on the Ethereum blockchain. It's designed to make it easier for developers to create and deploy smart contracts and build user interfaces that interact with those contracts.
+## Features
 
-⚙️ Built using NextJS, RainbowKit, Foundry, Wagmi, Viem, and Typescript.
+### Domain Listing
 
-- ✅ **Contract Hot Reload**: Your frontend auto-adapts to your smart contract as you edit it.
-- 🪝 **[Custom hooks](https://docs.scaffoldeth.io/hooks/)**: Collection of React hooks wrapper around [wagmi](https://wagmi.sh/) to simplify interactions with smart contracts with typescript autocompletion.
-- 🧱 [**Components**](https://docs.scaffoldeth.io/components/): Collection of common web3 components to quickly build your frontend.
-- 🔥 **Burner Wallet & Local Faucet**: Quickly test your application with a burner wallet and local faucet.
-- 🔐 **Integration with Wallet Providers**: Connect to different wallet providers and interact with the Ethereum network.
+- Owners can list their ENS domains for rent
+- Set a price per second in ETH
+- Define a maximum end date for rentals
+- Supports both wrapped and unwrapped ENS domains
+- Automatic handling of domain custody during rental period
 
-![Debug Contracts tab](https://github.com/scaffold-eth/scaffold-eth-2/assets/55535804/b237af0c-5027-4849-a5c1-2e31495cccb1)
+### Domain Renting
 
-## Quickstart
+- Renters can lease domains for any period up to the maximum end date
+- Pay-per-second pricing model
+- Automatic refund of excess payments
+- Instant transfer of ENS name control to renter
+- Protection against rental period overlaps
 
-To get started with Scaffold-ETH 2, follow the steps below:
+### Safety Features
 
-1. Install dependencies if it was skipped in CLI:
+- Automatic validation of domain expiry
+- Protection against zero prices
+- Validation of rental end dates
+- Checks for active rental periods
+- Safe handling of both ERC721 and ERC1155 tokens
+- Proper ETH transfer safety checks
 
+### Domain Management
+
+- Lenders can reclaim domains after rental period
+- Recovery mechanism for expired rentals
+- Automatic return of domain control
+- Clear rental terms tracking
+
+### Ideas
+
+- [ ] Rental ownership through NFT
+- [ ] Protocol fees
+- [ ] Dynamic auction parameters
+
+## Technical Details
+
+### Contract Architecture
+
+The system consists of three main components:
+
+1. Base Registrar Interface (ERC721)
+2. Name Wrapper Interface (ERC1155)
+3. ENS Registry Interface
+
+### Commands
+
+#### Lend and Borrow
+
+Change the domain name in the script to the desired domain and set the private key in the .env file.
+
+```bash
+forge script script/lendAndBorrow.s.sol \
+    --rpc-url sepolia \
+    -vvvvv \
+    --chain 11155111 \
+    --verify \
+    --broadcast \
+    --slow
 ```
-cd my-dapp-example
-npm run install
+
+### Key Structs
+
+```solidity
+struct RentalTerms {
+    address lender;          // Domain owner
+    uint256 pricePerSecond;  // Rental price in wei/second
+    uint256 maxEndTimestamp; // Maximum rental end date
+    address currentBorrower; // Current renter
+    uint256 rentalEnd;      // Current rental end time
+    bytes32 nameNode;       // ENS node hash
+}
 ```
 
-2. Run a local network in the first terminal:
+### Main Functions
 
-```
-npm run chain
-```
+#### List Domain
 
-This command starts a local Ethereum network using Foundry. The network runs on your local machine and can be used for testing and development. You can customize the network configuration in `foundry.toml`.
-
-1. On a second terminal, deploy the test contract:
-
-```
-npm run deploy
-```
-
-This command deploys a test smart contract to the local network. The contract is located in `packages/foundry/contracts` and can be modified to suit your needs. The `npm run deploy` command uses the deploy script located in `packages/foundry/script` to deploy the contract to the network. You can also customize the deploy script.
-
-4. On a third terminal, start your NextJS app:
-
-```
-npm run start
+```solidity
+function listDomain(
+    uint256 tokenId,
+    uint256 pricePerSecond,
+    uint256 maxEndTimestamp,
+    bytes32 nameNode
+) external
 ```
 
-Visit your app on: `http://localhost:3000`. You can interact with your smart contract using the `Debug Contracts` page. You can tweak the app config in `packages/nextjs/scaffold.config.ts`.
+#### Rent Domain
 
-Run smart contract test with `npm run foundry:test`
+```solidity
+function rentDomain(
+    uint256 tokenId,
+    uint256 desiredEndTimestamp
+) external payable
+```
 
-- Edit your smart contracts in `packages/foundry/contracts`
-- Edit your frontend homepage at `packages/nextjs/app/page.tsx`. For guidance on [routing](https://nextjs.org/docs/app/building-your-application/routing/defining-routes) and configuring [pages/layouts](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts) checkout the Next.js documentation.
-- Edit your deployment scripts in `packages/foundry/script`
+#### Reclaim Domain
 
-## 🚀 Setup Ponder Extension
+```solidity
+function reclaimDomain(
+    uint256 tokenId
+) external
+```
 
-This extension allows to use Ponder (https://ponder.sh/) for event indexing on an SE-2 dapp.
+## Events
 
-Ponder is an open-source framework for blockchain application backends. With Ponder, you can rapidly build & deploy an API that serves custom data from smart contracts on any EVM blockchain.
+```solidity
+event DomainListed(uint256 indexed tokenId, address indexed lender, uint256 pricePerSecond, uint256 maxEndTimestamp, bytes32 nameNode);
+event DomainRented(uint256 indexed tokenId, address indexed borrower, uint256 rentalEnd, uint256 totalPrice);
+event DomainReclaimed(uint256 indexed tokenId, address indexed lender);
+```
 
-### Config
+## Error Handling
 
-Ponder config (```packages/ponder/ponder.config.ts```) is set automatically from the deployed contracts and using the first blockchain network setup at ```packages/nextjs/scaffold.config.ts```.
+The contract includes custom errors for better gas efficiency and clearer error messages:
 
-### Design your schema
+- `ZeroPriceNotAllowed()`
+- `MaxEndTimeMustBeFuture()`
+- `MaxEndTimeExceedsExpiry()`
+- `DomainNotListed()`
+- `ExceedsMaxEndTime()`
+- And more...
 
-You can define your Ponder data schema on the file at ```packages/ponder/ponder.schema.ts``` following the Ponder documentation (https://ponder.sh/docs/schema).
+## Usage Examples
 
-### Indexing data
+### List a Domain for Rent
 
-You can index events by adding files to ```packages/ponder/src/``` (https://ponder.sh/docs/indexing/create-update-records)
+```solidity
+// List domain for 0.0001 ETH per second until Dec 31, 2024
+contract.listDomain(
+    tokenId,
+    100000000000000, // 0.0001 ETH in wei
+    1735689600,      // Dec 31, 2024
+    nameNode
+);
+```
 
-### Start the development server
+### Rent a Domain
 
-Run ```npm run ponder:dev``` to start the Ponder development server, for indexing and serving the GraphQL API endpoint at http://localhost:42069
+```solidity
+// Rent domain until Nov 1, 2024
+contract.rentDomain{value: 1 ether}(
+    tokenId,
+    1698796800  // Nov 1, 2024
+);
+```
 
-### Query the GraphQL API
+## Security Considerations
 
-With the dev server running, open http://localhost:42069 in your browser to use the GraphiQL interface. GraphiQL is a useful tool for exploring your schema and testing queries during development. (https://ponder.sh/docs/query/graphql)
+- Contract holds ENS domains during rental periods
+- Implements reentrancy protection
+- Safe ETH transfer handling
+- Proper access control for domain operations
+- Validation of all time-based parameters
+- Protection against rental overlap
 
-You can query data on a page using ```@tanstack/react-query```. Check the code at ```packages/nextjs/app/greetings/page.ts``` to get the greetings updates data and show it.
+## Dependencies
 
-### Deploy
+- OpenZeppelin Contracts
+  - ERC721Holder
+  - ERC1155Holder
 
-To deploy the Ponder indexer please refer to the Ponder Deploy documentation https://ponder.sh/docs/production/deploy
+## License
 
-At **Settings** -> **Deploy** -> you must set **Custom Start Command** to ```npm run ponder:start```.
-
-For faster indexing, you can add the ***startBlock*** to each deployed contract on the file ```packages/nextjs/contracts/deployedContracts.ts```.
-
-And then you have to set up the ```NEXT_PUBLIC_PONDER_URL``` env variable on your SE-2 dapp to use the deployed ponder indexer.
-
-
-## Documentation
-
-Visit our [docs](https://docs.scaffoldeth.io) to learn how to start building with Scaffold-ETH 2.
-
-To know more about its features, check out our [website](https://scaffoldeth.io).
-
-## Contributing to Scaffold-ETH 2
-
-We welcome contributions to Scaffold-ETH 2!
-
-Please see [CONTRIBUTING.MD](https://github.com/scaffold-eth/scaffold-eth-2/blob/main/CONTRIBUTING.md) for more information and guidelines for contributing to Scaffold-ETH 2.
+MIT License
