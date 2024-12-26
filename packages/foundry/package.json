@@ -9,7 +9,7 @@
     "chain": "make chain",
     "compile": "make compile",
     "deploy": "node scripts-js/parseArgs.js",
-    "deploy:verify": "node scripts/parseArgs.js --verify",
+    "deploy:verify": "node scripts-js/parseArgs.js --verify",
     "flatten": "make flatten",
     "fork": "make fork FORK_URL=${1:-mainnet}",
     "format": "make format",
@@ -24,10 +24,11 @@
     "dotenv": "~16.3.1",
     "envfile": "~6.18.0",
     "ethers": "~5.7.1",
+    "forge-std": "github:foundry-rs/forge-std",
     "prettier": "~2.8.8",
     "qrcode": "~1.5.3",
-    "toml": "~3.0.0",
-    "forge-std": "github:foundry-rs/forge-std"
+    "solidity-bytes-utils": "^0.8.2",
+    "toml": "~3.0.0"
   },
   "devDependencies": {
     "shx": "~0.3.4"

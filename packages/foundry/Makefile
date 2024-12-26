@@ -1,6 +1,6 @@
 .PHONY: build deploy generate-abis verify-keystore account chain compile deploy-verify flatten fork format lint test verify
 
-DEPLOY_SCRIPT ?= script/Deploy.s.sol
+DEPLOY_SCRIPT ?= packages/foundry/script/Deploy.s.sol
 
 # setup wallet for anvil
 setup-anvil-wallet:
@@ -33,7 +33,7 @@ deploy:
 			forge script $(DEPLOY_SCRIPT) --rpc-url localhost --broadcast --legacy --ffi; \
 		fi \
 	else \
-		forge script $(DEPLOY_SCRIPT) --rpc-url $(RPC_URL) --broadcast --legacy --ffi; \
+		forge script $(DEPLOY_SCRIPT) --rpc-url $(RPC_URL) --broadcast --legacy --ffi --verify; \
 	fi
 
 # Build and deploy target
@@ -75,9 +75,9 @@ deploy-verify:
 	fi
 	@if [ "$(RPC_URL)" = "localhost" ]; then \
 		if [ "$(ETH_KEYSTORE_ACCOUNT)" = "scaffold-eth-default" ]; then \
-			forge script $(DEPLOY_SCRIPT) --rpc-url localhost --password localhost --broadcast --legacy --ffi --verify; \
+			forge script $(DEPLOY_SCRIPT) --rpc-url localhost --password localhost --broadcast --legacy --ffi; \
 		else \
-			forge script $(DEPLOY_SCRIPT) --rpc-url localhost --broadcast --legacy --ffi --verify; \
+			forge script $(DEPLOY_SCRIPT) --rpc-url localhost --broadcast --legacy --ffi; \
 		fi \
 	else \
 		forge script $(DEPLOY_SCRIPT) --rpc-url $(RPC_URL) --broadcast --legacy --ffi --verify; \
@@ -98,7 +98,7 @@ lint:
 
 # Verify contracts
 verify:
-	forge script script/VerifyAll.s.sol --ffi --rpc-url $(RPC_URL)
+	forge script script/VerifyAll.s.sol --ffi --rpc-url sepolia
 
 build-and-verify: build verify
 

@@ -15,7 +15,7 @@ const ALCHEMY_API_KEY =
 async function getBalanceForEachNetwork(address) {
   try {
     // Read the foundry.toml file
-    const foundryTomlPath = join(__dirname, "..", "foundry.toml");
+    const foundryTomlPath = join(__dirname, "..", "..","..","foundry.toml");
     const tomlString = readFileSync(foundryTomlPath, "utf-8");
 
     // Parse the tomlString to get the JS object representation

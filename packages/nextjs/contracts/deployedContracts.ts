@@ -5,9 +5,9 @@
 import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 
 const deployedContracts = {
-  31337: {
+  11155111: {
     ENSRent: {
-      address: "0x700b6a60ce7eaaea56f065753d8dcb9653dbad35",
+      address: "0xb3c3563a5c796a8bcc31ad5184511e65473aab3b",
       abi: [
         {
           type: "constructor",
@@ -580,8 +580,8 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deploymentFile: "run-1734965677.json",
-      deploymentScript: "Deploy.s.sol",
+      deploymentFile: "run-1735225726.json",
+      deploymentScript: "DeployENSRent.s.sol",
     },
   },
 } as const;

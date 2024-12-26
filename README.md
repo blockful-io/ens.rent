@@ -34,9 +34,9 @@ npm run install
 npm run chain
 ```
 
-This command starts a local Ethereum network using Foundry. The network runs on your local machine and can be used for testing and development. You can customize the network configuration in `packages/foundry/foundry.toml`.
+This command starts a local Ethereum network using Foundry. The network runs on your local machine and can be used for testing and development. You can customize the network configuration in `foundry.toml`.
 
-3. On a second terminal, deploy the test contract:
+1. On a second terminal, deploy the test contract:
 
 ```
 npm run deploy

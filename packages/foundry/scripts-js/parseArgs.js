@@ -32,12 +32,10 @@ Examples:
 
 // Parse arguments
 for (let i = 0; i < args.length; i++) {
-  if (args[i] === "--network" && args[i + 1]) {
-    network = args[i + 1];
-    i++; // Skip next arg since we used it
-  } else if (args[i] === "--file" && args[i + 1]) {
-    fileName = args[i + 1];
-    i++; // Skip next arg since we used it
+  if (args[i].match(/^network=/)) {
+    network = args[i].split("=")[1];
+  } else if (args[i].match(/^file=/)) {
+    fileName = args[i].split("=")[1];
   }
 }
 
