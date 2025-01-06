@@ -1,26 +1,37 @@
 [profile.default]
-  evm_version = "paris"
-  optimizer = true
-  optimizer_runs = 100
-  via_ir = true
-  solc_version = "0.8.26"
-  verbosity = 3
+src = 'packages/foundry/contracts'
+out = 'packages/foundry/out'
+test = 'packages/foundry/test'
+libs = ['packages/foundry/lib']
+broadcast = 'broadcast'
+fs_permissions = [{ access = "read-write", path = "./" }]
+remappings = [
+  "@ens-contracts=node_modules/@ensdomains/ens-contracts/contracts",
+  "@openzeppelin=node_modules/@openzeppelin",
+  "forge-std=node_modules/forge-std/src",
+  "solidity-bytes-utils=node_modules/solidity-bytes-utils/contracts",
+]
 
 [rpc_endpoints]
-  mainnet = "${MAINNET_RPC_URL}"
-  sepolia = "${SEPOLIA_RPC_URL}"
+default_network = "http://127.0.0.1:8545"
+localhost = "http://127.0.0.1:8545"
 
-[fmt]
-  bracket_spacing = true
-  int_types = "long"
-  line_length = 120
-  multiline_func_header = "all"
-  number_underscore = "thousands"
-  quote_style = "double"
-  tab_width = 4
-  wrap_comments = true
+mainnet = "https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}"
+sepolia = "https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
+arbitrum = "https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
+arbitrumSepolia = "https://arb-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
 
 [etherscan]
-  mainnet = { key = "${ETHERSCAN_API_KEY}" }
-  testnet = { key = "${ETHERSCAN_API_KEY}", chain = "11155111" }
-# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+sepolia = { key = "${ETHERSCAN_API_KEY}" }
+
+
+[fmt]
+line_length = 120
+tab_width = 4
+quote_style = "double"
+bracket_spacing = true
+int_types = "long"
+contract_new_lines = true
+multiline_func_header = "all"
+
+# See more config options https://github.com/foundry-rs/foundry/tree/master/config

@@ -5,6 +5,7 @@ A smart contract system that enables ENS domain owners to rent out their domains
 ## Features
 
 ### Domain Listing
+
 - Owners can list their ENS domains for rent
 - Set a price per second in ETH
 - Define a maximum end date for rentals
@@ -12,6 +13,7 @@ A smart contract system that enables ENS domain owners to rent out their domains
 - Automatic handling of domain custody during rental period
 
 ### Domain Renting
+
 - Renters can lease domains for any period up to the maximum end date
 - Pay-per-second pricing model
 - Automatic refund of excess payments
@@ -19,6 +21,7 @@ A smart contract system that enables ENS domain owners to rent out their domains
 - Protection against rental period overlaps
 
 ### Safety Features
+
 - Automatic validation of domain expiry
 - Protection against zero prices
 - Validation of rental end dates
@@ -27,12 +30,14 @@ A smart contract system that enables ENS domain owners to rent out their domains
 - Proper ETH transfer safety checks
 
 ### Domain Management
+
 - Lenders can reclaim domains after rental period
 - Recovery mechanism for expired rentals
 - Automatic return of domain control
 - Clear rental terms tracking
 
 ### Ideas
+
 - [ ] Rental ownership through NFT
 - [ ] Protocol fees
 - [ ] Dynamic auction parameters
@@ -40,7 +45,9 @@ A smart contract system that enables ENS domain owners to rent out their domains
 ## Technical Details
 
 ### Contract Architecture
+
 The system consists of three main components:
+
 1. Base Registrar Interface (ERC721)
 2. Name Wrapper Interface (ERC1155)
 3. ENS Registry Interface
@@ -48,7 +55,9 @@ The system consists of three main components:
 ### Commands
 
 #### Lend and Borrow
+
 Change the domain name in the script to the desired domain and set the private key in the .env file.
+
 ```bash
 forge script script/lendAndBorrow.s.sol \
     --rpc-url sepolia \
@@ -75,6 +84,7 @@ struct RentalTerms {
 ### Main Functions
 
 #### List Domain
+
 ```solidity
 function listDomain(
     uint256 tokenId,
@@ -85,6 +95,7 @@ function listDomain(
 ```
 
 #### Rent Domain
+
 ```solidity
 function rentDomain(
     uint256 tokenId,
@@ -93,6 +104,7 @@ function rentDomain(
 ```
 
 #### Reclaim Domain
+
 ```solidity
 function reclaimDomain(
     uint256 tokenId
@@ -110,6 +122,7 @@ event DomainReclaimed(uint256 indexed tokenId, address indexed lender);
 ## Error Handling
 
 The contract includes custom errors for better gas efficiency and clearer error messages:
+
 - `ZeroPriceNotAllowed()`
 - `MaxEndTimeMustBeFuture()`
 - `MaxEndTimeExceedsExpiry()`
@@ -120,6 +133,7 @@ The contract includes custom errors for better gas efficiency and clearer error 
 ## Usage Examples
 
 ### List a Domain for Rent
+
 ```solidity
 // List domain for 0.0001 ETH per second until Dec 31, 2024
 contract.listDomain(
@@ -131,6 +145,7 @@ contract.listDomain(
 ```
 
 ### Rent a Domain
+
 ```solidity
 // Rent domain until Nov 1, 2024
 contract.rentDomain{value: 1 ether}(
@@ -155,4 +170,5 @@ contract.rentDomain{value: 1 ether}(
   - ERC1155Holder
 
 ## License
+
 MIT License
