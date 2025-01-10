@@ -3,15 +3,10 @@
 import Link from "next/link";
 import { ShoppingBag, Tag, Wallet } from "lucide-react";
 import type { NextPage } from "next";
-import { useAccount } from "wagmi";
-import { BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { Button } from "~~/components/old-dapp/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~~/components/old-dapp/ui/card";
-import { Address } from "~~/components/scaffold-eth";
 
 const Home: NextPage = () => {
-  const { address: connectedAddress } = useAccount();
-
   return (
     <div className="min-h-screen bg-base-100 bg-gradient-to-b from-blue-100 to-white dark:from-gray-900 dark:to-gray-800">
       {/* Main Content */}
@@ -28,7 +23,7 @@ const Home: NextPage = () => {
         {/* Options Grid */}
         <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-2">
           {/* Rent a Domain Card */}
-          <Card className="flex flex-col transition-shadow hover:shadow-lg">
+          <Card className="flex flex-col transition-shadow hover:shadow-lg bg-white">
             <CardHeader>
               <div className="flex items-center space-x-2">
                 <ShoppingBag className="size-6 text-blue-500 dark:text-blue-400" />
@@ -57,14 +52,14 @@ const Home: NextPage = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button className="w-full" size="lg" asChild>
+              <Button className="w-full bg-black text-white hover:bg-gray-800" size="lg" asChild>
                 <Link href="/browse">Find Domains to Rent</Link>
               </Button>
             </CardFooter>
           </Card>
 
           {/* List Your Domains Card */}
-          <Card className="flex flex-col transition-shadow hover:shadow-lg">
+          <Card className="flex flex-col transition-shadow hover:shadow-lg bg-white">
             <CardHeader>
               <div className="flex items-center space-x-2">
                 <Tag className="size-6 text-green-500 dark:text-green-400" />
@@ -93,7 +88,7 @@ const Home: NextPage = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button variant="secondary" className="w-full" size="lg" asChild>
+              <Button variant="secondary" className="w-full bg-gray-100 text-black hover:bg-gray-50" size="lg" asChild>
                 <Link href="/lend">List Your Domains</Link>
               </Button>
             </CardFooter>

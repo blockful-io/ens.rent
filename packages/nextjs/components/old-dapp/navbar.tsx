@@ -1,17 +1,25 @@
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "./ui/button";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Button } from "@/src/components/ui/button";
-import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
-import { useRouter } from "next/router";
+import { useAccount } from "wagmi";
 
 export function SiteHeader() {
   const { address } = useAccount();
-
   const router = useRouter();
 
+  const handleNavigation = (path: string) => {
+    console.log("address", address);
+    if (!address) {
+      toast.error("Please connect your wallet");
+      return;
+    }
+    router.push(path);
+  };
+
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background">
+    <header className="sticky top-0 z-40 w-full border-b bg-white">
       <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0 mx-auto">
         <nav>
           <Link href="/" className="flex items-center space-x-2">
@@ -21,30 +29,14 @@ export function SiteHeader() {
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-4">
           <nav className="flex items-center space-x-1">
-            <Button variant="ghost" asChild>
+            <Button asChild variant="ghost">
               <Link href={"/browse"}>Rent</Link>
             </Button>
-            <Button
-              onClick={() => {
-                if (!address) {
-                  toast.error("Please connect your wallet");
-                }
-              }}
-              variant="ghost"
-              asChild
-            >
-              <Link href={address ? "/lend" : router.asPath}>List</Link>
+            <Button onClick={() => handleNavigation("/lend")} variant="ghost">
+              List
             </Button>
-            <Button
-              onClick={() => {
-                if (!address) {
-                  toast.error("Please connect your wallet");
-                }
-              }}
-              variant="ghost"
-              asChild
-            >
-              <Link href={address ? "/manage" : router.asPath}>Manage</Link>
+            <Button onClick={() => handleNavigation("/manage")} variant="ghost">
+              Manage
             </Button>
           </nav>
           {/* <nav className="flex items-center space-x-1">
