@@ -66,9 +66,7 @@ export default function useDomainData(domain: string): [Domain | null, boolean, 
           throw new Error("Invalid response data");
         }
 
-        const {
-          data: { listing: _listing },
-        } = responseData;
+        const _listing = responseData.data.listing;
 
         if (!_listing) {
           setError("Listings not found");

@@ -86,7 +86,7 @@ export default function RegisteredDomains() {
     }
 
     getDomains();
-  }, [availableNames, filteredStatus]);
+  }, [availableNames, filteredStatus, listings, rentalIns, rentalOuts, searchTerm, sortBy]);
 
   useEffect(() => {
     setFilteredDomains(prevDomains => sortDomains(prevDomains, sortBy));
@@ -131,8 +131,8 @@ export default function RegisteredDomains() {
 
   if (isLoadingAvailables || isLoadingListings || isLoading || isUnlisting) {
     return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 flex items-center justify-center">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen  dark:bg-gray-900 p-4 flex items-center justify-center">
+        <Card className="w-full max-w-md bg-white">
           <CardHeader>
             <CardTitle>Loading...</CardTitle>
           </CardHeader>
@@ -169,7 +169,7 @@ export default function RegisteredDomains() {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
       <div className="container mx-auto py-8 ">
-        <Card>
+        <Card className="bg-white">
           <CardHeader>
             <CardTitle>My Registered Domains</CardTitle>
             <CardDescription>
@@ -218,7 +218,7 @@ export default function RegisteredDomains() {
                       )}
                     </SelectValue>
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white">
                     <SelectItem value="all">All Status</SelectItem>
                     <SelectItem value="available">
                       <span
@@ -274,9 +274,9 @@ export default function RegisteredDomains() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredDomains.map(domain => {
+                    {filteredDomains.map((domain, index) => {
                       return (
-                        <TableRow key={domain.id}>
+                        <TableRow key={index}>
                           <TableCell className="font-medium">{domain.name}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
@@ -367,7 +367,7 @@ export default function RegisteredDomains() {
       </div>
 
       <Dialog open={!!unlistDomain} onOpenChange={() => setUnlistDomain(null)}>
-        <DialogContent>
+        <DialogContent className="bg-white">
           <DialogHeader>
             <DialogTitle>Confirm Unlist</DialogTitle>
             <DialogDescription>
