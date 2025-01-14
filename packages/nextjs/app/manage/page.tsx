@@ -86,7 +86,7 @@ export default function RegisteredDomains() {
     }
 
     getDomains();
-  }, [availableNames, filteredStatus, listings, rentalIns, rentalOuts, searchTerm, sortBy]);
+  }, [availableNames, filteredStatus, listings, rentalIns, rentalOuts, searchTerm, sortBy]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     setFilteredDomains(prevDomains => sortDomains(prevDomains, sortBy));

@@ -111,7 +111,7 @@ export default function useDomainData(domain: string): [Domain | null, boolean, 
     };
 
     fetchListings();
-  }, [domain]);
+  }, [domain, address, ensRentGraphQL]);
 
   return [listing, isLoading, error];
 }

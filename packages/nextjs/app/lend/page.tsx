@@ -54,7 +54,7 @@ export default function Component() {
       }).extend(publicActions);
       setWalletClient(client);
     }
-  }, [address]);
+  }, [address, publicClient]);
 
   const searchParams = useSearchParams();
 
@@ -102,7 +102,7 @@ export default function Component() {
 
   useEffect(() => {
     if (domain) checkApproval(domain);
-  }, [domain]);
+  }, [domain, publicClient?.chain.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const approveDomain = async (domainToApprove: string) => {
     if (!walletClient) return;
