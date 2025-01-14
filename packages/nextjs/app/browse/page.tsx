@@ -280,7 +280,7 @@ export default function Component() {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
       <div className="container mx-auto py-8 flex flex-col gap-4">
-        <Card>
+        <Card className="bg-white">
           <CardHeader>
             <CardTitle>Available ENS Domains</CardTitle>
             <CardDescription>
@@ -315,7 +315,7 @@ export default function Component() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white">
           <CardHeader>
             <CardTitle>Latest Rented ENS Domains</CardTitle>
             <CardDescription>Browse and check what you missed out on - FOMO guaranteed! 🔥</CardDescription>

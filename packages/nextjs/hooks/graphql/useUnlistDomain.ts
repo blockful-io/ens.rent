@@ -1,7 +1,7 @@
 import { useState } from "react";
-// import ensRentABI from "@/abis/ensrent.json";
 import { Chain, Hex, createWalletClient, custom, labelhash, publicActions } from "viem";
 import { usePublicClient } from "wagmi";
+import ensRentABI from "~~/abis/ensrent.json";
 import { getEnsRentAddress } from "~~/wagmi";
 
 export function useUnlistDomain() {
@@ -25,14 +25,14 @@ export function useUnlistDomain() {
 
       const tokenId = BigInt(labelhash(domainName.replace(".eth", "")));
 
-      // const hash = await walletClient.writeContract({
-      //   address: ensRentAddress,
-      //   abi: ensRentABI,
-      //   functionName: "reclaimDomain",
-      //   args: [tokenId],
-      // });
+      const hash = await walletClient.writeContract({
+        address: ensRentAddress,
+        abi: ensRentABI,
+        functionName: "reclaimDomain",
+        args: [tokenId],
+      });
 
-      // await walletClient.waitForTransactionReceipt({ hash });
+      await walletClient.waitForTransactionReceipt({ hash });
       return true;
     } catch (err) {
       setError(new Error("Failed to unlist domain"));
