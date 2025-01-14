@@ -87,7 +87,7 @@ export const Address = ({
   const { targetNetwork } = useTargetNetwork();
 
   const { data: ens, isLoading: isEnsNameLoading } = useEnsName({
-    address: checkSumAddress,
+    address: checkSumAddress as `0x${string}`,
     chainId: 1,
     query: {
       enabled: isAddress(checkSumAddress ?? ""),

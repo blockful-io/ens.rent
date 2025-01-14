@@ -14,7 +14,7 @@ const Home: NextPage = () => {
         {/* Welcome Section */}
         <div className="mb-12 text-center">
           <h1 className="mb-4 text-4xl font-bold dark:text-white">Welcome to ENS Rent</h1>
-          <p className="mx-auto max-w-2xl text-lg text-muted-foreground dark:text-gray-300">
+          <p className="mx-auto max-w-2xl text-lg text-muted-foreground text-gray-500">
             Your platform for renting and listing ENS domains. Choose whether you want to rent a domain or list your
             domains for others to rent.
           </p>
@@ -29,7 +29,9 @@ const Home: NextPage = () => {
                 <ShoppingBag className="size-6 text-blue-500 dark:text-blue-400" />
                 <CardTitle>Rent a Domain</CardTitle>
               </div>
-              <CardDescription>Browse and rent available ENS domains for your project or organization</CardDescription>
+              <CardDescription className="text-gray-500">
+                Browse and rent available ENS domains for your project or organization
+              </CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
               <div className="space-y-2 text-sm dark:text-gray-300">
@@ -52,7 +54,7 @@ const Home: NextPage = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button className="w-full bg-black text-white hover:bg-gray-800" size="lg" asChild>
+              <Button className="w-full bg-gray-900 text-white hover:bg-gray-800" size="lg" asChild>
                 <Link href="/browse">Find Domains to Rent</Link>
               </Button>
             </CardFooter>
@@ -65,7 +67,9 @@ const Home: NextPage = () => {
                 <Tag className="size-6 text-green-500 dark:text-green-400" />
                 <CardTitle>List Your Domains</CardTitle>
               </div>
-              <CardDescription>List your ENS domains for rent and earn passive income</CardDescription>
+              <CardDescription className="text-gray-500">
+                List your ENS domains for rent and earn passive income
+              </CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
               <div className="space-y-2 text-sm dark:text-gray-300">

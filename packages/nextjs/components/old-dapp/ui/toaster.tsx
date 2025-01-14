@@ -1,5 +1,5 @@
 import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "./toast";
-import { useToast } from "@/src/hooks/use-toast";
+import { useToast } from "~~/hooks/graphql/use-toast";
 
 export function Toaster() {
   const { toasts } = useToast();
