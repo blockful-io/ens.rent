@@ -23,8 +23,6 @@ export default function RentedDomainDetails() {
     address: rental?.lender as `0x${string}`,
   });
 
-  console.log("rental", rental);
-
   const address = rental?.rentals ? rental?.rentals[0]?.borrower : "0x";
   const { data: borrowerEnsName } = useEnsName({
     address: address as `0x${string}`,
@@ -59,8 +57,6 @@ export default function RentedDomainDetails() {
       </div>
     );
   }
-
-  console.log("lenderEnsName", lenderEnsName);
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">

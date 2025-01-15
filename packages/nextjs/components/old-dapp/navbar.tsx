@@ -10,7 +10,6 @@ export function SiteHeader() {
   const router = useRouter();
 
   const handleNavigation = (path: string) => {
-    console.log("address", address);
     if (!address) {
       toast.error("Please connect your wallet");
       return;
