@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Calendar, ExternalLink, Link, Loader2, Timer, User, Wallet } from "lucide-react";
+import { ArrowLeft, Calendar, ExternalLink, Loader2, Timer, User, Wallet } from "lucide-react";
 import { formatEther } from "viem";
 import { useEnsName, usePublicClient } from "wagmi";
 import { Button } from "~~/components/old-dapp/ui/button";
@@ -24,7 +25,7 @@ export default function RentedDomainDetails() {
 
   console.log("rental", rental);
 
-  const address = rental?.rentals?.items ? rental?.rentals?.items[0]?.borrower : "0x";
+  const address = rental?.rentals ? rental?.rentals[0]?.borrower : "0x";
   const { data: borrowerEnsName } = useEnsName({
     address: address as `0x${string}`,
   });
@@ -58,6 +59,8 @@ export default function RentedDomainDetails() {
       </div>
     );
   }
+
+  console.log("lenderEnsName", lenderEnsName);
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
@@ -117,11 +120,11 @@ export default function RentedDomainDetails() {
                   <div className="space-y-1">
                     <div className="text-sm">
                       <span className="text-gray-500 dark:text-gray-400 mr-1">Start:</span>
-                      {rental.rentals?.items?.length ? formatDate(rental.rentals.items[0].startTime) : "-"}
+                      {rental.rentals?.length ? formatDate(rental.rentals[0].startTime) : "-"}
                     </div>
                     <div className="text-sm">
                       <span className="text-gray-500 dark:text-gray-400 mr-1">End:</span>
-                      {rental.rentals?.items?.length ? formatDate(rental.rentals.items[0].endTime) : "-"}
+                      {rental.rentals?.length ? formatDate(rental.rentals[0].endTime) : "-"}
                     </div>
                   </div>
                 </div>
@@ -131,10 +134,10 @@ export default function RentedDomainDetails() {
                     <span>Parties</span>
                   </div>
                   <div className="space-y-1">
-                    <div className="flex flex-col">
-                      <span className="gap-2 mt-2 text-sm text-gray-500 dark:text-gray-400">Owner:</span>
+                    <div className="flex gap-2 mt-2 items-center ">
+                      <span className="gap-2 text-sm text-gray-500 dark:text-gray-400">Owner:</span>
                       {lenderEnsName ? (
-                        <div>
+                        <div className="flex justify-center gap-2">
                           <Link
                             target="_blank"
                             href={`https://app.ens.domains/${lenderEnsName}`}
@@ -161,7 +164,7 @@ export default function RentedDomainDetails() {
                             </Link>
                           </div>
                         ) : (
-                          <span className="text-sm">{rental.rentals?.items[0].borrower}</span>
+                          <span className="text-sm">{rental.rentals?.[0].borrower}</span>
                         )}
                       </div>
                     )}
@@ -177,8 +180,8 @@ export default function RentedDomainDetails() {
                 window.open(
                   `${client!.chain!.blockExplorers!.default.url}/tx/${
                     (rental.status === RentalStatus.rentedOut || rental.status === RentalStatus.rentedIn) &&
-                    rental.rentals?.items?.length
-                      ? rental.rentals?.items[0].id
+                    rental.rentals?.length
+                      ? rental.rentals?.[0].id
                       : rental.id
                   }`,
                   "_blank",
@@ -201,14 +204,11 @@ export default function RentedDomainDetails() {
     </div>
   );
 }
-
 const formatDate = (date: number): string => {
   return new Date(date).toLocaleString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
   });
 };
 
