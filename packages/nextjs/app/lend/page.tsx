@@ -1,30 +1,52 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import toast from "react-hot-toast";
-import { createWalletClient, custom, formatEther, labelhash, namehash, parseEther, publicActions } from "viem";
-import { useAccount, usePublicClient } from "wagmi";
-import baseRegistrarABI from "~~/abis/baseRegistrar.json";
-import ensRentABI from "~~/abis/ensrent.json";
-import nameWrapperABI from "~~/abis/nameWrapper.json";
-import { Button } from "~~/components/old-dapp/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~~/components/old-dapp/ui/card";
-import { Input } from "~~/components/old-dapp/ui/input";
-import { Label } from "~~/components/old-dapp/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~~/components/old-dapp/ui/select";
-import useDomainsByAddress from "~~/hooks/graphql/useDomains";
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import toast from 'react-hot-toast';
 import {
-  baseRegistrarAddress, // ensRentAddress,
-  getEnsRentAddress,
-  getNameWrapperAddress, // nameWrapperAddress,
-} from "~~/wagmi";
+  createWalletClient,
+  custom,
+  formatEther,
+  labelhash,
+  namehash,
+  parseEther,
+  publicActions,
+} from 'viem';
+import { useAccount, usePublicClient } from 'wagmi';
+import baseRegistrarABI from '~~/abis/baseRegistrar.json';
+import ensRentABI from '~~/abis/ensrent.json';
+import nameWrapperABI from '~~/abis/nameWrapper.json';
+import { Button } from '~~/components/old-dapp/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '~~/components/old-dapp/ui/card';
+import { Input } from '~~/components/old-dapp/ui/input';
+import { Label } from '~~/components/old-dapp/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~~/components/old-dapp/ui/select';
+import useDomainsByAddress from '~~/hooks/graphql/useDomains';
+import { getEnsRentAddress } from '~~/wagmi';
+import {
+  addresses,
+  getChainContractAddress,
+} from '@ensdomains/ensjs/contracts';
+import { mainnet } from 'viem/chains';
 
 export const ONE_YEAR_IN_SECONDS = 31536000;
 
 export default function Component() {
   const router = useRouter();
-  const [domain, setDomain] = useState("");
+  const [domain, setDomain] = useState('');
   const [price, setPrice] = useState<string>();
   const [duration, setDuration] = useState(0);
   const { address } = useAccount();
@@ -36,17 +58,30 @@ export default function Component() {
   const publicClient = usePublicClient();
 
   const ensRentAddress = getEnsRentAddress(publicClient?.chain.id || 1);
-  const nameWrapperAddress = getNameWrapperAddress(publicClient?.chain.id || 1);
 
   const [isListing, setIsListing] = useState(false);
   const [isCheckingApproval, setIsCheckingApproval] = useState(false);
 
-  const pricePerSecond = price ? parseEther(price) / BigInt(ONE_YEAR_IN_SECONDS) : BigInt(0);
+  const pricePerSecond = price
+    ? parseEther(price) / BigInt(ONE_YEAR_IN_SECONDS)
+    : BigInt(0);
+
+  const baseRegistrarAddress = getChainContractAddress({
+    blockNumber: BigInt(0),
+    client: { chain: publicClient?.chain ?? mainnet },
+    contract: 'ensBaseRegistrarImplementation',
+  });
+
+  const ensNameWrapperAddress = getChainContractAddress({
+    blockNumber: BigInt(0),
+    client: { chain: publicClient?.chain ?? mainnet },
+    contract: 'ensNameWrapper',
+  });
 
   useEffect(() => {
     if (!publicClient) return;
 
-    if (typeof window !== "undefined" && address) {
+    if (typeof window !== 'undefined' && address) {
       const client = createWalletClient({
         account: address,
         transport: custom(window.ethereum),
@@ -59,8 +94,8 @@ export default function Component() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (searchParams.get("domain")) {
-      setDomain(searchParams.get("domain") as string);
+    if (searchParams.get('domain')) {
+      setDomain(searchParams.get('domain') as string);
     }
   }, [searchParams]);
 
@@ -71,22 +106,22 @@ export default function Component() {
 
     setIsCheckingApproval(true);
     try {
-      const name = domainToCheck.split(".")[0];
+      const name = domainToCheck.split('.')[0];
       const tokenId = BigInt(labelhash(name)).toString();
 
       let owner = (await walletClient.readContract({
         address: baseRegistrarAddress,
         abi: baseRegistrarABI,
-        functionName: "ownerOf",
+        functionName: 'ownerOf',
         args: [tokenId],
       })) as `0x${string}`;
 
-      if (owner !== nameWrapperAddress) owner = baseRegistrarAddress;
+      if (owner !== ensNameWrapperAddress) owner = baseRegistrarAddress;
 
       const approvedForAll = (await walletClient.readContract({
         address: owner,
         abi: nameWrapperABI,
-        functionName: "isApprovedForAll",
+        functionName: 'isApprovedForAll',
         args: [address, ensRentAddress],
       })) as boolean;
 
@@ -109,23 +144,23 @@ export default function Component() {
 
     setIsApproving(true);
     try {
-      const name = domainToApprove.split(".")[0];
+      const name = domainToApprove.split('.')[0];
       const tokenId = BigInt(labelhash(name));
 
       let owner = (await walletClient.readContract({
         address: baseRegistrarAddress,
         abi: baseRegistrarABI,
-        functionName: "ownerOf",
+        functionName: 'ownerOf',
         args: [tokenId],
       })) as `0x${string}`;
 
-      if (owner !== nameWrapperAddress) owner = baseRegistrarAddress;
+      if (owner !== ensNameWrapperAddress) owner = baseRegistrarAddress;
 
       setCheckYourWallet(true);
       const { request } = await walletClient.simulateContract({
         address: owner,
         abi: nameWrapperABI,
-        functionName: "setApprovalForAll",
+        functionName: 'setApprovalForAll',
         args: [ensRentAddress, true],
         account: address,
       });
@@ -152,7 +187,7 @@ export default function Component() {
     setIsListing(true);
     try {
       const node = namehash(domainToList);
-      const name = domainToList.split(".")[0];
+      const name = domainToList.split('.')[0];
       const tokenId = BigInt(labelhash(name));
 
       const pricePerSecond = parseEther(price) / BigInt(ONE_YEAR_IN_SECONDS);
@@ -162,7 +197,7 @@ export default function Component() {
       const { request } = await walletClient.simulateContract({
         address: ensRentAddress,
         abi: ensRentABI,
-        functionName: "listDomain",
+        functionName: 'listDomain',
         args: [tokenId, pricePerSecond, maxEndTimestamp, node, name],
         account: address,
       });
@@ -183,10 +218,10 @@ export default function Component() {
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (!address) {
-        toast.error("Please connect your wallet", {
-          id: "wallet-connect-error",
+        toast.error('Please connect your wallet', {
+          id: 'wallet-connect-error',
         });
-        router.push("/");
+        router.push('/');
         return null;
       }
     }, 500);
@@ -205,7 +240,7 @@ export default function Component() {
             <p>{error.message}</p>
           </CardContent>
           <CardFooter>
-            <Button onClick={() => router.push("/")} variant="outline">
+            <Button onClick={() => router.push('/')} variant="outline">
               Return Home
             </Button>
           </CardFooter>
@@ -248,7 +283,7 @@ export default function Component() {
                     <SelectValue placeholder="Select a domain" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
-                    {names?.map(name => (
+                    {names?.map((name) => (
                       <SelectItem key={name} value={name}>
                         {name}
                       </SelectItem>
@@ -263,9 +298,9 @@ export default function Component() {
                         Checking approval status...
                       </span>
                     ) : isApproved ? (
-                      "✅ This domain is already approved for rental"
+                      '✅ This domain is already approved for rental'
                     ) : (
-                      "📝 This domain needs approval before it can be listed"
+                      '📝 This domain needs approval before it can be listed'
                     )}
                   </p>
                 )}
@@ -277,14 +312,19 @@ export default function Component() {
                   type="text"
                   value={price}
                   placeholder="0.01"
-                  onChange={e => {
-                    if (!e.target.value || /^\d*(\.\d{0,18})?$/.test(e.target.value)) {
+                  onChange={(e) => {
+                    if (
+                      !e.target.value ||
+                      /^\d*(\.\d{0,18})?$/.test(e.target.value)
+                    ) {
                       setPrice(e.target.value);
                     }
                   }}
                 />
                 {!!price && (
-                  <p className="text-sm text-gray-500 mt-1">Price per second: {formatEther(pricePerSecond)} ETH</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Price per second: {formatEther(pricePerSecond)} ETH
+                  </p>
                 )}
               </div>
               <div className="space-y-2">
@@ -292,14 +332,16 @@ export default function Component() {
                 <Input
                   id="endDate"
                   type="date"
-                  min={new Date().toISOString().split("T")[0]}
-                  onChange={e => {
+                  min={new Date().toISOString().split('T')[0]}
+                  onChange={(e) => {
                     const start = new Date().getTime();
                     const end = new Date(e.target.value).getTime();
                     setDuration(Math.floor((end - start) / 1000));
                   }}
                 />
-                <p className="text-sm text-gray-500 mt-1">Note: It must be before the domain&apos;s expiry date</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Note: It must be before the domain&apos;s expiry date
+                </p>
               </div>
             </div>
           </CardContent>
@@ -318,14 +360,18 @@ export default function Component() {
                 }}
                 disabled={!domain || isApproving}
               >
-                {isApproving ? "Approving..." : "Approve Domain for Rental"}
+                {isApproving ? 'Approving...' : 'Approve Domain for Rental'}
               </Button>
             ) : (
               <Button
                 onClick={async () => await listDomain(domain)}
                 disabled={!domain || !price || duration <= 0 || isListing}
               >
-                {checkYourWallet ? "Check your wallet" : isListing ? "Listing Domain..." : "List Domain for Rent"}
+                {checkYourWallet
+                  ? 'Check your wallet'
+                  : isListing
+                    ? 'Listing Domain...'
+                    : 'List Domain for Rent'}
               </Button>
             )}
           </CardFooter>

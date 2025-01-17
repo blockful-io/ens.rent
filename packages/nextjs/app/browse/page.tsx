@@ -1,19 +1,40 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Clock, Search, TrendingDown } from "lucide-react";
-import { formatEther } from "viem";
-import { useAccount, useChainId, useEnsName } from "wagmi";
-import { Button } from "~~/components/old-dapp/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~~/components/old-dapp/ui/card";
-import { Input } from "~~/components/old-dapp/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~~/components/old-dapp/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~~/components/old-dapp/ui/table";
-import useAvailableDomains from "~~/hooks/graphql/useAvailableDomains";
-import useRentedDomains, { RentedDomainType } from "~~/hooks/graphql/useRentedDomains";
-import { Domain } from "~~/types/types";
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Clock, Search, TrendingDown } from 'lucide-react';
+import { formatEther } from 'viem';
+import { useAccount, useChainId, useEnsName } from 'wagmi';
+import { Button } from '~~/components/old-dapp/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '~~/components/old-dapp/ui/card';
+import { Input } from '~~/components/old-dapp/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~~/components/old-dapp/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '~~/components/old-dapp/ui/table';
+import useAvailableDomains from '~~/hooks/graphql/useAvailableDomains';
+import useRentedDomains, {
+  RentedDomainType,
+} from '~~/hooks/graphql/useRentedDomains';
+import { Domain } from '~~/types/types';
 
 const EnsName = ({ address }: { address: `0x${string}` }) => {
   const { data: ensName } = useEnsName({ address });
@@ -34,10 +55,10 @@ const EnsName = ({ address }: { address: `0x${string}` }) => {
 };
 
 export default function Component() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchRented, setSearchRented] = useState("");
-  const [sortBy, setSortBy] = useState("price");
-  const [orderRented, setOrderRented] = useState("time");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchRented, setSearchRented] = useState('');
+  const [sortBy, setSortBy] = useState('price');
+  const [orderRented, setOrderRented] = useState('time');
   const router = useRouter();
   const { address } = useAccount();
 
@@ -51,10 +72,21 @@ export default function Component() {
 
   const chainId = useChainId();
 
-  const [getInitialPage, getNextPage, getPreviousPage, hasNextPage, hasPreviousPage] = useAvailableDomains(address);
+  const [
+    getInitialPage,
+    getNextPage,
+    getPreviousPage,
+    hasNextPage,
+    hasPreviousPage,
+  ] = useAvailableDomains(address);
 
-  const [getInitialRentedPage, getNextRentedPage, getPreviousRentedPage, hasNextPageRented, hasPreviousPageRented] =
-    useRentedDomains(address);
+  const [
+    getInitialRentedPage,
+    getNextRentedPage,
+    getPreviousRentedPage,
+    hasNextPageRented,
+    hasPreviousPageRented,
+  ] = useRentedDomains(address);
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -63,7 +95,7 @@ export default function Component() {
         const domains = await getInitialPage(searchTerm, sortBy);
         setAvailableDomains(domains);
       } catch (err) {
-        console.log("err", err);
+        console.log('err', err);
         setError(err as Error);
       } finally {
         setIsLoading(false);
@@ -80,7 +112,7 @@ export default function Component() {
         const domains = await getInitialRentedPage(searchRented, orderRented);
         setRentedDomains(domains);
       } catch (err) {
-        console.log("err", err);
+        console.log('err', err);
         setErrorRented(err as Error);
       } finally {
         setIsLoadingRented(false);
@@ -155,7 +187,7 @@ export default function Component() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredDomains.map(domain => (
+            {filteredDomains.map((domain) => (
               <TableRow key={domain.id}>
                 <TableCell className="font-medium">{domain.name}</TableCell>
                 <TableCell>
@@ -167,7 +199,9 @@ export default function Component() {
                 <TableCell>
                   <div className="flex items-center">
                     <Clock className="w-4 h-4 text-blue-500 mr-2" />
-                    {new Date(Number(domain.maxRentalTime) * 1000).toLocaleDateString("en-GB")}
+                    {new Date(
+                      Number(domain.maxRentalTime) * 1000
+                    ).toLocaleDateString('en-GB')}
                   </div>
                 </TableCell>
                 <TableCell>
@@ -176,7 +210,12 @@ export default function Component() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Button size="sm" onClick={() => router.push(`/auctions/simple/${domain.name}`)}>
+                  <Button
+                    size="sm"
+                    onClick={() =>
+                      router.push(`/auctions/simple/${domain.name}`)
+                    }
+                  >
                     Rent Now
                   </Button>
                 </TableCell>
@@ -187,10 +226,18 @@ export default function Component() {
       </div>
 
       <div className="flex justify-end gap-4 mt-4">
-        <Button variant="outline" onClick={handlePreviousPage} disabled={isLoading || !hasPreviousPage}>
+        <Button
+          variant="outline"
+          onClick={handlePreviousPage}
+          disabled={isLoading || !hasPreviousPage}
+        >
           Previous
         </Button>
-        <Button variant="outline" onClick={handleNextPage} disabled={isLoading || !hasNextPage}>
+        <Button
+          variant="outline"
+          onClick={handleNextPage}
+          disabled={isLoading || !hasNextPage}
+        >
           Next
         </Button>
       </div>
@@ -219,25 +266,35 @@ export default function Component() {
                   return;
                 }
                 return (
-                  <TableRow key={domain?.listing?.id} className={"bg-gray-100 hover:bg-gray-100"}>
+                  <TableRow
+                    key={domain?.listing?.id}
+                    className={'bg-gray-100 hover:bg-gray-100'}
+                  >
                     <TableCell className="font-medium">{`${domain?.listing?.name}.eth`}</TableCell>
                     <TableCell>
                       <div className="flex items-center">
                         <TrendingDown className="w-4 h-4 text-green-500 mr-2" />
-                        {formatEther(BigInt(domain?.listing?.price || 0) * BigInt(365 * 24 * 60 * 60))}
+                        {formatEther(
+                          BigInt(domain?.listing?.price || 0) *
+                            BigInt(365 * 24 * 60 * 60)
+                        )}
                         ETH
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
                         <Clock className="w-4 h-4 text-blue-500 mr-2" />
-                        {new Date(Number(domain?.startTime || 0) * 1000).toLocaleDateString("en-GB")}
+                        {new Date(
+                          Number(domain?.startTime || 0) * 1000
+                        ).toLocaleDateString('en-GB')}
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
                         <Clock className="w-4 h-4 text-blue-500 mr-2" />
-                        {new Date(Number(domain.endTime) * 1000).toLocaleDateString("en-GB")}
+                        {new Date(
+                          Number(domain.endTime) * 1000
+                        ).toLocaleDateString('en-GB')}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -247,11 +304,19 @@ export default function Component() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
-                        <EnsName address={domain?.listing?.lender as `0x${string}`} />
+                        <EnsName
+                          address={domain?.listing?.lender as `0x${string}`}
+                        />
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Button size="sm" disabled onClick={() => router.push(`/auctions/simple/${domain.listing.name}`)}>
+                      <Button
+                        size="sm"
+                        disabled
+                        onClick={() =>
+                          router.push(`/auctions/simple/${domain.listing.name}`)
+                        }
+                      >
                         Already Rented
                       </Button>
                     </TableCell>
@@ -269,7 +334,11 @@ export default function Component() {
           >
             Previous
           </Button>
-          <Button variant="outline" onClick={handleNextRentedPage} disabled={isLoadingRented || !hasNextPageRented}>
+          <Button
+            variant="outline"
+            onClick={handleNextRentedPage}
+            disabled={isLoadingRented || !hasNextPageRented}
+          >
             Next
           </Button>
         </div>
@@ -284,7 +353,8 @@ export default function Component() {
           <CardHeader>
             <CardTitle>Available ENS Domains</CardTitle>
             <CardDescription>
-              Browse and rent available ENS domains - Show all domains available for rent
+              Browse and rent available ENS domains - Show all domains available
+              for rent
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -295,7 +365,7 @@ export default function Component() {
                   <Input
                     placeholder="Search domains..."
                     value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-8"
                   />
                 </div>
@@ -310,7 +380,13 @@ export default function Component() {
                 </Select>
               </div>
 
-              {isLoading ? <p>Loading available domains...</p> : error ? <p>Error: {error.message}</p> : <TableView />}
+              {isLoading ? (
+                <p>Loading available domains...</p>
+              ) : error ? (
+                <p>Error: {error.message}</p>
+              ) : (
+                <TableView />
+              )}
             </div>
           </CardContent>
         </Card>
@@ -318,7 +394,9 @@ export default function Component() {
         <Card className="bg-white">
           <CardHeader>
             <CardTitle>Latest Rented ENS Domains</CardTitle>
-            <CardDescription>Browse and check what you missed out on - FOMO guaranteed! 🔥</CardDescription>
+            <CardDescription>
+              Browse and check what you missed out on - FOMO guaranteed! 🔥
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col gap-4">
@@ -328,7 +406,7 @@ export default function Component() {
                   <Input
                     placeholder="Search domains..."
                     value={searchRented}
-                    onChange={e => setSearchRented(e.target.value)}
+                    onChange={(e) => setSearchRented(e.target.value)}
                     className="pl-8"
                   />
                 </div>
