@@ -46,7 +46,7 @@ export const WriteOnlyFunctionForm = ({
       try {
         const makeWriteWithParams = () =>
           writeContractAsync({
-            address: contractAddress,
+            address: contractAddress as `0x${string}`,
             functionName: abiFunction.name,
             abi: abi,
             args: getParsedContractFunctionArgs(form),

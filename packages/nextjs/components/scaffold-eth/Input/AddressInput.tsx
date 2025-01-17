@@ -40,7 +40,7 @@ export const AddressInput = ({ value, name, placeholder, onChange, disabled }: C
     isError: isEnsNameError,
     isSuccess: isEnsNameSuccess,
   } = useEnsName({
-    address: settledValue as Address,
+    address: settledValue as `0x${string}`,
     chainId: 1,
     query: {
       enabled: isAddress(debouncedValue),

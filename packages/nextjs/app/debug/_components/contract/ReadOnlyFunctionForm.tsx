@@ -34,7 +34,7 @@ export const ReadOnlyFunctionForm = ({
   const { targetNetwork } = useTargetNetwork();
 
   const { isFetching, refetch, error } = useReadContract({
-    address: contractAddress,
+    address: contractAddress as `0x${string}`,
     functionName: abiFunction.name,
     abi: abi,
     args: getParsedContractFunctionArgs(form),

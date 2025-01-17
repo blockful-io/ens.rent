@@ -25,7 +25,7 @@ export const Balance = ({ address, className = "", usdMode }: BalanceProps) => {
     isError,
     isLoading,
   } = useWatchBalance({
-    address,
+    address: address as `0x${string}`,
   });
 
   const { displayUsdMode, toggleDisplayUsdMode } = useDisplayUsdMode({ defaultUsdMode: usdMode });

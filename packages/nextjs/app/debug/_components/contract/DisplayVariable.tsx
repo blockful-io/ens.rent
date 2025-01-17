@@ -34,7 +34,7 @@ export const DisplayVariable = ({
     refetch,
     error,
   } = useReadContract({
-    address: contractAddress,
+    address: contractAddress as `0x${string}`,
     functionName: abiFunction.name,
     abi: abi,
     chainId: targetNetwork.id,

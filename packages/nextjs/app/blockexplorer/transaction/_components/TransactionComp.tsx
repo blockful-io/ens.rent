@@ -25,7 +25,8 @@ const TransactionComp = ({ txHash }: { txHash: Hash }) => {
         const tx = await client.getTransaction({ hash: txHash });
         const receipt = await client.getTransactionReceipt({ hash: txHash });
 
-        const transactionWithDecodedData = decodeTransactionData(tx);
+        // Cast tx as Transaction to ensure type compatibility
+        const transactionWithDecodedData = decodeTransactionData(tx as Transaction);
         setTransaction(transactionWithDecodedData);
         setReceipt(receipt);
 

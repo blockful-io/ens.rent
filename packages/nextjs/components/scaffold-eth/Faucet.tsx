@@ -61,9 +61,9 @@ export const Faucet = () => {
     try {
       setLoading(true);
       await faucetTxn({
-        to: inputAddress,
+        to: inputAddress as `0x${string}`,
         value: parseEther(sendValue as `${number}`),
-        account: faucetAddress,
+        account: faucetAddress as `0x${string}`,
       });
       setLoading(false);
       setInputAddress(undefined);
