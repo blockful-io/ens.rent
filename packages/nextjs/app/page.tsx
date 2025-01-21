@@ -15,7 +15,7 @@ import {
 
 const Home: NextPage = () => {
   return (
-    <div className="min-h-[calc(100vh-70px)] bg-base-100 bg-gradient-to-b from-blue-100 to-white dark:from-gray-900 dark:to-gray-800">
+    <div className="h-[calc(100vh-65px)] bg-base-100 bg-gradient-to-b from-blue-100 to-white dark:from-gray-900 dark:to-gray-800">
       {/* Main Content */}
       <main className="container mx-auto px-4 py-12">
         {/* Welcome Section */}
@@ -119,7 +119,7 @@ const Home: NextPage = () => {
         </div>
 
         {/* Info Section */}
-        <div className="mt-16 text-center">
+        <div className="mt-8 text-center">
           <h2 className="mb-4 text-2xl font-semibold dark:text-white">
             How It Works
           </h2>
