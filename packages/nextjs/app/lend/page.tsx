@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import {
@@ -36,15 +36,12 @@ import {
 } from '~~/components/old-dapp/ui/select';
 import useDomainsByAddress from '~~/hooks/graphql/useDomains';
 import { getEnsRentAddress } from '~~/wagmi';
-import {
-  addresses,
-  getChainContractAddress,
-} from '@ensdomains/ensjs/contracts';
+import { getChainContractAddress } from '@ensdomains/ensjs/contracts';
 import { mainnet } from 'viem/chains';
 
-export const ONE_YEAR_IN_SECONDS = 31536000;
+const ONE_YEAR_IN_SECONDS = 31536000;
 
-export default function Component() {
+function LendPage() {
   const router = useRouter();
   const [domain, setDomain] = useState('');
   const [price, setPrice] = useState<string>();
@@ -378,5 +375,13 @@ export default function Component() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function Component() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LendPage />
+    </Suspense>
   );
 }
