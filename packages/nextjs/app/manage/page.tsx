@@ -1,14 +1,21 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Search, Tag, Timer } from "lucide-react";
-import toast from "react-hot-toast";
-import { formatEther, labelhash, namehash } from "viem";
-import { useAccount, useEnsName, usePublicClient } from "wagmi";
-import { Button } from "~~/components/old-dapp/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~~/components/old-dapp/ui/card";
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Search, Tag, Timer } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { formatEther, labelhash, namehash } from 'viem';
+import { useAccount, useEnsName, usePublicClient } from 'wagmi';
+import { Button } from '~~/components/old-dapp/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '~~/components/old-dapp/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -16,29 +23,49 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "~~/components/old-dapp/ui/dialog";
-import { Input } from "~~/components/old-dapp/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~~/components/old-dapp/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~~/components/old-dapp/ui/table";
-import useDomainsByAddress from "~~/hooks/graphql/useDomains";
-import useListings from "~~/hooks/graphql/useListings";
-import { useUnlistDomain } from "~~/hooks/graphql/useUnlistDomain";
-import { Domain, RentalStatus } from "~~/types/types";
-import { getStatusColor } from "~~/utils/old-dapp/utils";
+} from '~~/components/old-dapp/ui/dialog';
+import { Input } from '~~/components/old-dapp/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~~/components/old-dapp/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '~~/components/old-dapp/ui/table';
+import useDomainsByAddress from '~~/hooks/graphql/useDomains';
+import useListings from '~~/hooks/graphql/useListings';
+import { useUnlistDomain } from '~~/hooks/graphql/useUnlistDomain';
+import { Domain, RentalStatus } from '~~/types/types';
+import { getStatusColor } from '~~/utils/old-dapp/utils';
+import { EnsDappLink } from '~~/components/EnsDappLink';
 
 export default function RegisteredDomains() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("name");
-  const [filteredStatus, setFilteredStatus] = useState<RentalStatus | "all">("all");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('name');
+  const [filteredStatus, setFilteredStatus] = useState<RentalStatus | 'all'>(
+    'all'
+  );
   const [isLoading, setIsLoading] = useState(true);
-  const [unlistDomain, setUnlistDomain] = useState<Pick<Domain, "id" | "name"> | null>(null);
+  const [unlistDomain, setUnlistDomain] = useState<Pick<
+    Domain,
+    'id' | 'name'
+  > | null>(null);
   const router = useRouter();
   const { address } = useAccount();
   const [listings, rentalIns, rentalOuts, isLoadingListings] = useListings({
-    lender: address || "",
+    lender: address || '',
   });
 
-  const [availableNames, isLoadingAvailables, error] = useDomainsByAddress(address);
+  const [availableNames, isLoadingAvailables, error] =
+    useDomainsByAddress(address);
   const [filteredDomains, setFilteredDomains] = useState<Domain[]>([]);
 
   const { unlistDomain: unlistDomainFn, isUnlisting } = useUnlistDomain();
@@ -46,10 +73,10 @@ export default function RegisteredDomains() {
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (!address) {
-        toast.error("Please connect your wallet", {
-          id: "wallet-connect-error",
+        toast.error('Please connect your wallet', {
+          id: 'wallet-connect-error',
         });
-        router.push("/");
+        router.push('/');
       }
     }, 500);
 
@@ -67,18 +94,18 @@ export default function RegisteredDomains() {
             name,
             status: RentalStatus.available,
             lender: address!,
-            createdAt: "",
+            createdAt: '',
             node: namehash(name),
-            tokenId: Number(labelhash(name.replace(".eth", ""))).toString(),
-          }),
+            tokenId: Number(labelhash(name.replace('.eth', ''))).toString(),
+          })
         ),
         ...listings,
         ...rentalIns,
         ...rentalOuts,
       ].filter(
-        domain =>
+        (domain) =>
           domain.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-          (filteredStatus === "all" || domain.status === filteredStatus),
+          (filteredStatus === 'all' || domain.status === filteredStatus)
       );
 
       setFilteredDomains(sortDomains(filteredDomains, sortBy));
@@ -86,10 +113,18 @@ export default function RegisteredDomains() {
     }
 
     getDomains();
-  }, [availableNames, filteredStatus, listings, rentalIns, rentalOuts, searchTerm, sortBy]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [
+    availableNames,
+    filteredStatus,
+    listings,
+    rentalIns,
+    rentalOuts,
+    searchTerm,
+    sortBy,
+  ]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    setFilteredDomains(prevDomains => sortDomains(prevDomains, sortBy));
+    setFilteredDomains((prevDomains) => sortDomains(prevDomains, sortBy));
   }, [sortBy]);
 
   const handleUnlist = async () => {
@@ -119,12 +154,16 @@ export default function RegisteredDomains() {
     return (
       <span>
         {(ensName && (
-          <Link target="_blank" className="text-blue-500 hover:underline" href={`https://app.ens.domains/${borrower}`}>
+          <Link
+            target="_blank"
+            className="text-blue-500 hover:underline"
+            href={`https://app.ens.domains/${borrower}`}
+          >
             {ensName.toString()}
           </Link>
         )) ||
           borrower ||
-          "-"}
+          '-'}
       </span>
     );
   }
@@ -157,7 +196,7 @@ export default function RegisteredDomains() {
             <p>{error.message}</p>
           </CardContent>
           <CardFooter>
-            <Button onClick={() => router.push("/")} variant="outline">
+            <Button onClick={() => router.push('/')} variant="outline">
               Return Home
             </Button>
           </CardFooter>
@@ -173,7 +212,8 @@ export default function RegisteredDomains() {
           <CardHeader>
             <CardTitle>My Registered Domains</CardTitle>
             <CardDescription>
-              Manage your registered ENS domains and their rental status - Show lend domains and their status
+              Manage your registered ENS domains and their rental status - Show
+              lend domains and their status
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -185,7 +225,7 @@ export default function RegisteredDomains() {
                   <Input
                     placeholder="Search domains..."
                     value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-8"
                   />
                 </div>
@@ -201,19 +241,22 @@ export default function RegisteredDomains() {
                 </Select>
                 <Select
                   value={filteredStatus}
-                  onValueChange={(value: string) => setFilteredStatus(value as RentalStatus | "all")}
+                  onValueChange={(value: string) =>
+                    setFilteredStatus(value as RentalStatus | 'all')
+                  }
                 >
                   <SelectTrigger className="w-[180px]">
                     <SelectValue>
-                      {filteredStatus === "all" ? (
-                        "All Status"
+                      {filteredStatus === 'all' ? (
+                        'All Status'
                       ) : (
                         <span
                           className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${getStatusColor(
-                            filteredStatus,
+                            filteredStatus
                           )}`}
                         >
-                          {filteredStatus.charAt(0).toUpperCase() + filteredStatus.slice(1)}
+                          {filteredStatus.charAt(0).toUpperCase() +
+                            filteredStatus.slice(1)}
                         </span>
                       )}
                     </SelectValue>
@@ -223,7 +266,7 @@ export default function RegisteredDomains() {
                     <SelectItem value="available">
                       <span
                         className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${getStatusColor(
-                          RentalStatus.available,
+                          RentalStatus.available
                         )}`}
                       >
                         Available
@@ -232,7 +275,7 @@ export default function RegisteredDomains() {
                     <SelectItem value="rented out">
                       <span
                         className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${getStatusColor(
-                          RentalStatus.rentedOut,
+                          RentalStatus.rentedOut
                         )}`}
                       >
                         Rented out
@@ -241,7 +284,7 @@ export default function RegisteredDomains() {
                     <SelectItem value="rented in">
                       <span
                         className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${getStatusColor(
-                          RentalStatus.rentedIn,
+                          RentalStatus.rentedIn
                         )}`}
                       >
                         Rented in
@@ -250,7 +293,7 @@ export default function RegisteredDomains() {
                     <SelectItem value="listed">
                       <span
                         className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${getStatusColor(
-                          RentalStatus.listed,
+                          RentalStatus.listed
                         )}`}
                       >
                         Listed
@@ -268,7 +311,9 @@ export default function RegisteredDomains() {
                       <TableHead>Domain Name</TableHead>
                       <TableHead>Expiry</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead className="hidden md:table-cell">Current Renter</TableHead>
+                      <TableHead className="hidden md:table-cell">
+                        Current Renter
+                      </TableHead>
                       <TableHead>Rental Price</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
@@ -277,15 +322,22 @@ export default function RegisteredDomains() {
                     {filteredDomains.map((domain, index) => {
                       return (
                         <TableRow key={index}>
-                          <TableCell className="font-medium">{domain.name}</TableCell>
+                          <TableCell className="font-medium">
+                            <EnsDappLink name={domain.name} />
+                          </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <Timer className="h-4 w-4 text-gray-500" />
                               {domain.maxRentalTime ? (
                                 <div className="flex flex-col">
-                                  <span>{new Date(parseInt(domain.maxRentalTime) * 1000).toLocaleDateString()}</span>
+                                  <span>
+                                    {new Date(
+                                      parseInt(domain.maxRentalTime) * 1000
+                                    ).toLocaleDateString()}
+                                  </span>
                                   <span className="text-xs text-gray-500">
-                                    ({getTimeUntilExpiry(domain.maxRentalTime)} days left)
+                                    ({getTimeUntilExpiry(domain.maxRentalTime)}{' '}
+                                    days left)
                                   </span>
                                 </div>
                               ) : (
@@ -296,19 +348,28 @@ export default function RegisteredDomains() {
                           <TableCell>
                             <span
                               className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${getStatusColor(
-                                domain.status,
+                                domain.status
                               )}`}
                             >
-                              {domain.status.charAt(0).toUpperCase() + domain.status.slice(1)}
+                              {domain.status.charAt(0).toUpperCase() +
+                                domain.status.slice(1)}
                             </span>
                           </TableCell>
                           <TableCell className="hidden md:table-cell">
-                            {domain.rentals?.length ? <BorrowerCell borrower={domain.rentals[0].borrower} /> : "-"}
+                            {domain.rentals?.length ? (
+                              <BorrowerCell
+                                borrower={domain.rentals[0].borrower}
+                              />
+                            ) : (
+                              '-'
+                            )}
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <Tag className="h-4 w-4 text-gray-500" />
-                              {domain.price ? `${formatEther(BigInt(domain.price))} ETH` : "-"}
+                              {domain.price
+                                ? `${formatEther(BigInt(domain.price))} ETH`
+                                : '-'}
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
@@ -318,7 +379,9 @@ export default function RegisteredDomains() {
                                   size="sm"
                                   className="w-28"
                                   variant="outline"
-                                  onClick={() => router.push(`/lend?domain=${domain.name}`)}
+                                  onClick={() =>
+                                    router.push(`/lend?domain=${domain.name}`)
+                                  }
                                 >
                                   List for Rent
                                 </Button>
@@ -344,7 +407,9 @@ export default function RegisteredDomains() {
                                   size="sm"
                                   variant="outline"
                                   className="w-28"
-                                  onClick={() => router.push(`/manage/${domain.name}`)}
+                                  onClick={() =>
+                                    router.push(`/manage/${domain.name}`)
+                                  }
                                 >
                                   View Details
                                 </Button>
@@ -367,7 +432,8 @@ export default function RegisteredDomains() {
           <DialogHeader>
             <DialogTitle>Confirm Unlist</DialogTitle>
             <DialogDescription>
-              Are you sure you want to unlist {unlistDomain?.name}? This will remove it from the rental marketplace.
+              Are you sure you want to unlist {unlistDomain?.name}? This will
+              remove it from the rental marketplace.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -385,20 +451,25 @@ export default function RegisteredDomains() {
 const getTimeUntilExpiry = (expiryDate: string) => {
   const now = new Date();
   const expiry = new Date(parseInt(expiryDate) * 1000);
-  const daysLeft = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  const daysLeft = Math.ceil(
+    (expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+  );
   return daysLeft;
 };
 
 const sortDomains = (domains: Domain[], sortBy: string) => {
   return [...domains].sort((a, b) => {
     switch (sortBy) {
-      case "name":
+      case 'name':
         return a.name.localeCompare(b.name);
-      case "expiry":
+      case 'expiry':
         if (!a.maxRentalTime) return 1;
         if (!b.maxRentalTime) return -1;
-        return new Date(a.maxRentalTime).getTime() - new Date(b.maxRentalTime).getTime();
-      case "price":
+        return (
+          new Date(a.maxRentalTime).getTime() -
+          new Date(b.maxRentalTime).getTime()
+        );
+      case 'price':
         if (!a.price) return 1;
         if (!b.price) return -1;
         return a.price - b.price;

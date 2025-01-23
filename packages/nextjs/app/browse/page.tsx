@@ -35,6 +35,7 @@ import useRentedDomains, {
   RentedDomainType,
 } from '~~/hooks/graphql/useRentedDomains';
 import { Domain } from '~~/types/types';
+import { EnsDappLink } from '~~/components/EnsDappLink';
 
 const EnsName = ({ address }: { address: `0x${string}` }) => {
   const { data: ensName } = useEnsName({ address });
@@ -189,7 +190,9 @@ export default function Component() {
           <TableBody>
             {filteredDomains.map((domain) => (
               <TableRow key={domain.id}>
-                <TableCell className="font-medium">{domain.name}</TableCell>
+                <TableCell className="font-medium">
+                  <EnsDappLink name={domain.name} />
+                </TableCell>
                 <TableCell>
                   <div className="flex items-center">
                     <TrendingDown className="w-4 h-4 text-green-500 mr-2" />
@@ -270,7 +273,9 @@ export default function Component() {
                     key={domain?.listing?.id}
                     className={'bg-gray-100 hover:bg-gray-100'}
                   >
-                    <TableCell className="font-medium">{`${domain?.listing?.name}.eth`}</TableCell>
+                    <TableCell className="font-medium">
+                      <EnsDappLink name={domain?.listing?.name} />
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center">
                         <TrendingDown className="w-4 h-4 text-green-500 mr-2" />
