@@ -60,9 +60,10 @@ export default function RegisteredDomains() {
   > | null>(null);
   const router = useRouter();
   const { address } = useAccount();
-  const [listings, rentalIns, rentalOuts, isLoadingListings] = useListings({
-    lender: address || '',
-  });
+  const [listings, expiredListings, rentalIns, rentalOuts, isLoadingListings] =
+    useListings({
+      lender: address || '',
+    });
 
   const [availableNames, isLoadingAvailables, error] =
     useDomainsByAddress(address);
@@ -100,6 +101,7 @@ export default function RegisteredDomains() {
           })
         ),
         ...listings,
+        ...expiredListings,
         ...rentalIns,
         ...rentalOuts,
       ].filter(
@@ -115,6 +117,7 @@ export default function RegisteredDomains() {
     getDomains();
   }, [
     availableNames,
+    expiredListings,
     filteredStatus,
     listings,
     rentalIns,
@@ -299,6 +302,15 @@ export default function RegisteredDomains() {
                         Listed
                       </span>
                     </SelectItem>
+                    <SelectItem value="expired">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${getStatusColor(
+                          RentalStatus.expired
+                        )}`}
+                      >
+                        Expired
+                      </span>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -327,21 +339,48 @@ export default function RegisteredDomains() {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              <Timer className="h-4 w-4 text-gray-500" />
+                              {domain.status !== RentalStatus.available && (
+                                <Timer className="h-4 w-4 text-gray-500" />
+                              )}
                               {domain.maxRentalTime ? (
                                 <div className="flex flex-col">
                                   <span>
                                     {new Date(
-                                      parseInt(domain.maxRentalTime) * 1000
+                                      parseInt(
+                                        domain.rentals?.[0]?.endTime.toString() ||
+                                          domain.maxRentalTime ||
+                                          '0'
+                                      ) * 1000
                                     ).toLocaleDateString()}
                                   </span>
                                   <span className="text-xs text-gray-500">
-                                    ({getTimeUntilExpiry(domain.maxRentalTime)}{' '}
-                                    days left)
+                                    {domain?.rentals?.[0]?.endTime.toString()
+                                      ? getTimeUntilExpiry(
+                                          domain?.rentals?.[0]?.endTime.toString()
+                                        ) < 0
+                                        ? `expired ${Math.abs(
+                                            getTimeUntilExpiry(
+                                              domain?.rentals?.[0]?.endTime.toString()
+                                            )
+                                          )} days ago`
+                                        : `${getTimeUntilExpiry(
+                                            domain?.rentals?.[0]?.endTime.toString()
+                                          )} days left`
+                                      : getTimeUntilExpiry(
+                                            domain?.maxRentalTime.toString()
+                                          ) < 0
+                                        ? `expired ${Math.abs(
+                                            getTimeUntilExpiry(
+                                              domain?.maxRentalTime.toString()
+                                            )
+                                          )} days ago`
+                                        : `${getTimeUntilExpiry(
+                                            domain?.maxRentalTime.toString()
+                                          )} days left`}
                                   </span>
                                 </div>
                               ) : (
-                                <span>N/A</span>
+                                '-'
                               )}
                             </div>
                           </TableCell>
@@ -386,7 +425,8 @@ export default function RegisteredDomains() {
                                   List for Rent
                                 </Button>
                               )}
-                              {domain.status === RentalStatus.listed && (
+                              {(domain.status === RentalStatus.listed ||
+                                domain.status === RentalStatus.expired) && (
                                 <Button
                                   size="sm"
                                   variant="outline"
