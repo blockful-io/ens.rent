@@ -1,4 +1,4 @@
 {
   "foundry_out_directory": "packages/foundry/out",
-  "filter_paths": ["node_modules"]
+  "filter_paths": "node_modules"
 }
