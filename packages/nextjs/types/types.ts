@@ -1,8 +1,9 @@
 export enum RentalStatus {
-  available = "available",
-  rentedOut = "rented out",
-  rentedIn = "rented in",
-  listed = "listed",
+  available = 'available',
+  rentedOut = 'rented out',
+  rentedIn = 'rented in',
+  listed = 'listed',
+  expired = 'expired',
 }
 
 export interface Domain {
