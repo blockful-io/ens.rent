@@ -20,6 +20,13 @@ export function EnsDappLink({
 
   const publicClient = usePublicClient();
 
+  // Helper function to shorten the address.
+  // This will turn an address like "0xa123456789abcdefa23..." into "0xa12...a23"
+  const shortenAddress = (addr: string): string => {
+    if (addr.length <= 10) return addr;
+    return `${addr.substring(0, 5)}...${addr.substring(addr.length - 3)}`;
+  };
+
   const getEnsAvatar = async () => {
     const ensText = nameToUse
       ? await publicClient?.getEnsAvatar({
@@ -56,7 +63,7 @@ export function EnsDappLink({
           {nameToUse}
         </Link>
       ) : (
-        <span>{address}</span>
+        <span>{address ? shortenAddress(address) : null}</span>
       )}
     </>
   );
