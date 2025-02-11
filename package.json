@@ -56,8 +56,5 @@
   },
   "engines": {
     "node": ">=18.18.0"
-  },
-  "dependencies": {
-    "boring-avatars": "^1.11.2"
   }
 }
