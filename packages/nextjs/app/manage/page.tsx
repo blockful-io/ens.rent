@@ -333,7 +333,7 @@ export default function RegisteredDomains() {
                   <TableBody>
                     {filteredDomains.map((domain, index) => {
                       return (
-                        <TableRow key={index}>
+                        <TableRow key={domain.name}>
                           <TableCell className="font-medium">
                             <EnsDappLink name={domain.name} />
                           </TableCell>
