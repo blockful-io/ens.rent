@@ -1,10 +1,17 @@
 'use client';
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from '@radix-ui/react-tooltip';
 import Avatar from 'boring-avatars';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { normalize } from 'viem/ens';
 import { useEnsName, usePublicClient } from 'wagmi';
+import { ensureEthSuffix } from '~~/utils/scaffold-eth/ensUtils';
 
 export function EnsDappLink({
   name,
@@ -16,8 +23,7 @@ export function EnsDappLink({
   const [ensAvatar, setEnsAvatar] = useState<string | null>(null);
   const { data: ensName } = useEnsName({ address });
 
-  const nameToUse = name || ensName;
-
+  const nameToUse = ensureEthSuffix(name || ensName);
   const publicClient = usePublicClient();
 
   // Helper function to shorten the address.
@@ -63,7 +69,24 @@ export function EnsDappLink({
           {nameToUse}
         </Link>
       ) : (
-        <span>{address ? shortenAddress(address) : null}</span>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <Link
+                href={`${publicClient?.chain?.blockExplorers?.default.url}/address/${address}`}
+                target="_blank"
+                className="text-blue-400 hover:underline flex items-center gap-2"
+              >
+                <span>{address ? shortenAddress(address) : null}</span>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent className="mb-2 shadow-md">
+              <div className="flex flex-col px-4 bg-white rounded-md">
+                <p>{address}</p>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       )}
     </>
   );
