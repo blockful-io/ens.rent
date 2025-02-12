@@ -1,12 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Search, Tag, Timer } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatEther, labelhash, namehash } from 'viem';
-import { useAccount, useEnsName, usePublicClient } from 'wagmi';
+import { useAccount } from 'wagmi';
 import { Button } from '~~/components/old-dapp/ui/button';
 import {
   Card,
@@ -141,35 +140,6 @@ export default function RegisteredDomains() {
     }
     setIsLoading(false);
   };
-
-  function BorrowerCell({ borrower }: { borrower: string }) {
-    const client = usePublicClient();
-
-    const { data: ensName, isLoading: isLoadingEns } = useEnsName({
-      address: borrower as `0x${string}`,
-      chainId: client?.chain.id,
-    });
-
-    if (isLoadingEns) {
-      return <span className="animate-pulse">Loading...</span>;
-    }
-
-    return (
-      <span>
-        {(ensName && (
-          <Link
-            target="_blank"
-            className="text-blue-500 hover:underline"
-            href={`https://app.ens.domains/${borrower}`}
-          >
-            {ensName.toString()}
-          </Link>
-        )) ||
-          borrower ||
-          '-'}
-      </span>
-    );
-  }
 
   if (isLoadingAvailables || isLoadingListings || isLoading || isUnlisting) {
     return (
@@ -396,8 +366,8 @@ export default function RegisteredDomains() {
                           </TableCell>
                           <TableCell className="hidden md:table-cell">
                             {domain.rentals?.length ? (
-                              <BorrowerCell
-                                borrower={domain.rentals[0].borrower}
+                              <EnsDappLink
+                                address={domain.rentals[0].borrower}
                               />
                             ) : (
                               '-'
