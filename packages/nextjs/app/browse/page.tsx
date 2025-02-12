@@ -254,7 +254,7 @@ export default function Component() {
                 }
                 return (
                   <TableRow
-                    key={domain?.listing?.name + 'asd'}
+                    key={domain?.listing?.id + '-rented-table-row'}
                     className={'bg-gray-100 hover:bg-gray-100'}
                   >
                     <TableCell className="font-medium">
