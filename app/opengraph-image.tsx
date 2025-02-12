@@ -58,7 +58,7 @@ export default async function Image(): Promise<ImageResponse> {
                 lineHeight: 1,
               }}
             >
-              ENS.Rent
+              ens.rent
             </h1>
             <p
               style={{
