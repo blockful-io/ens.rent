@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import React from "react";
 
 export const runtime = "edge";
-export const alt = "ENS.Rent";
+export const alt = "ens.rent";
 export const size = {
   width: 1200,
   height: 630,
