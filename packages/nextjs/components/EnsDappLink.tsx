@@ -40,8 +40,6 @@ export function EnsDappLink({
         })
       : null;
 
-    console.log(nameToUse + ' - ' + ensText);
-
     setEnsAvatar(ensText ?? '');
   };
 

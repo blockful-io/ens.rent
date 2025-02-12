@@ -190,10 +190,7 @@ export default function Component() {
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center">
-                    <EnsDappLink
-                      address={domain.lender as `0x${string}`}
-                      name={domain.name}
-                    />
+                    <EnsDappLink address={domain.lender} name={domain.name} />
                   </div>
                 </TableCell>
                 <TableCell>
@@ -288,16 +285,12 @@ export default function Component() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
-                        <EnsDappLink
-                          address={domain.borrower as `0x${string}`}
-                        />
+                        <EnsDappLink address={domain.borrower} />
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
-                        <EnsDappLink
-                          address={domain?.listing?.lender as `0x${string}`}
-                        />
+                        <EnsDappLink address={domain?.listing?.lender} />
                       </div>
                     </TableCell>
                     <TableCell>

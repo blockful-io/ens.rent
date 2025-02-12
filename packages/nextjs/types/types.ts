@@ -9,7 +9,7 @@ export enum RentalStatus {
 export interface Domain {
   id: string;
   price?: number;
-  lender: string;
+  lender: `0x${string}`;
   name: string;
   isWrapped?: boolean;
   createdAt: string;
@@ -22,7 +22,7 @@ export interface Domain {
     id: string;
     startTime: number;
     endTime: number;
-    borrower: string;
+    borrower: `0x${string}`;
     price: number;
   }[];
 }
