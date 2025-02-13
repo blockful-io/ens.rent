@@ -1,9 +1,9 @@
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Button } from "./ui/button";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import toast from "react-hot-toast";
-import { useAccount } from "wagmi";
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Button } from './ui/button';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import toast from 'react-hot-toast';
+import { useAccount } from 'wagmi';
 
 export function SiteHeader() {
   const { address } = useAccount();
@@ -11,7 +11,7 @@ export function SiteHeader() {
 
   const handleNavigation = (path: string) => {
     if (!address) {
-      toast.error("Please connect your wallet");
+      toast.error('Please connect your wallet');
       return;
     }
     router.push(path);
@@ -23,18 +23,18 @@ export function SiteHeader() {
         <nav>
           <Link href="/" className="flex items-center space-x-2">
             {/* <Icons.logo className="size-6" /> */}
-            <span className="inline-block font-bold">ENS Rent</span>
+            <span className="inline-block font-bold">ENS.Rent</span>
           </Link>
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-4">
           <nav className="flex items-center space-x-1">
             <Button asChild variant="ghost">
-              <Link href={"/browse"}>Rent</Link>
+              <Link href={'/browse'}>Rent</Link>
             </Button>
-            <Button onClick={() => handleNavigation("/lend")} variant="ghost">
+            <Button onClick={() => handleNavigation('/lend')} variant="ghost">
               List
             </Button>
-            <Button onClick={() => handleNavigation("/manage")} variant="ghost">
+            <Button onClick={() => handleNavigation('/manage')} variant="ghost">
               Manage
             </Button>
           </nav>

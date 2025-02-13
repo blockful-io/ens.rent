@@ -1,26 +1,26 @@
-import { useMemo, useState } from "react";
-import { ApolloClient, InMemoryCache, gql } from "@apollo/react-hooks";
-import { Address } from "viem";
-import { useChainId } from "wagmi";
-import { getEnsRentGraphQL } from "~~/wagmi";
+import { useMemo, useState } from 'react';
+import { ApolloClient, InMemoryCache, gql } from '@apollo/react-hooks';
+import { Address } from 'viem';
+import { useChainId } from 'wagmi';
+import { getEnsRentGraphQL } from '~~/wagmi';
 
 export type RentedDomainType = {
   id: string;
   startTime: string;
   endTime: string;
-  borrower: string;
+  borrower: `0x${string}`;
   listing: {
     id: string;
     name: string;
     price: string;
-    lender: string;
+    lender: `0x${string}`;
   };
 };
 
 const pageSize = 15;
 
 export default function useRentedDomains(
-  address: Address | undefined,
+  address: Address | undefined
 ): [
   (param?: string, orderBy?: string) => Promise<RentedDomainType[]>,
   (param?: string, orderBy?: string) => Promise<RentedDomainType[]>,
@@ -35,7 +35,8 @@ export default function useRentedDomains(
   const [startCursorState, setStartCursorState] = useState<string | null>(null);
   const [endCursorState, setEndCursorState] = useState<string | null>(null);
   const [hasNextPageState, setHasNextPageState] = useState<boolean>(false);
-  const [hasPreviousPageState, setHasPreviousPageState] = useState<boolean>(false);
+  const [hasPreviousPageState, setHasPreviousPageState] =
+    useState<boolean>(false);
 
   const client = useMemo(
     () =>
@@ -43,17 +44,17 @@ export default function useRentedDomains(
         uri: ensRentGraphQL,
         cache: new InMemoryCache(),
       }),
-    [ensRentGraphQL],
+    [ensRentGraphQL]
   );
 
   const getOrderByClause = (orderBy?: string) => {
     switch (orderBy) {
-      case "price":
+      case 'price':
         return 'orderBy: "price", orderDirection: "desc"';
-      case "time":
+      case 'time':
         return 'orderBy: "startTime", orderDirection: "desc"';
       default:
-        return "";
+        return '';
     }
   };
 
@@ -65,10 +66,15 @@ export default function useRentedDomains(
       whereConditions.push(`listingId_contains: "${param}"`);
     }
 
-    return whereConditions.length ? `where: {${whereConditions.join(", ")}}` : "where: {}";
+    return whereConditions.length
+      ? `where: {${whereConditions.join(', ')}}`
+      : 'where: {}';
   };
 
-  const getInitialPage = async (param?: string, orderBy?: string): Promise<RentedDomainType[]> => {
+  const getInitialPage = async (
+    param?: string,
+    orderBy?: string
+  ): Promise<RentedDomainType[]> => {
     setStartCursorState(null);
     setEndCursorState(null);
     setHasNextPageState(false);
@@ -116,8 +122,11 @@ export default function useRentedDomains(
     return data.rentals.items;
   };
 
-  const getNextPage = async (param?: string, orderBy?: string): Promise<RentedDomainType[]> => {
-    const afterParam = endCursorState ? `, after: "${endCursorState}"` : "";
+  const getNextPage = async (
+    param?: string,
+    orderBy?: string
+  ): Promise<RentedDomainType[]> => {
+    const afterParam = endCursorState ? `, after: "${endCursorState}"` : '';
     const whereClause = getWhereClause(param);
     const orderByClause = getOrderByClause(orderBy);
 
@@ -161,8 +170,13 @@ export default function useRentedDomains(
     return data.rentals.items;
   };
 
-  const getPreviousPage = async (param?: string, orderBy?: string): Promise<RentedDomainType[]> => {
-    const beforeParam = startCursorState ? `, before: "${startCursorState}"` : "";
+  const getPreviousPage = async (
+    param?: string,
+    orderBy?: string
+  ): Promise<RentedDomainType[]> => {
+    const beforeParam = startCursorState
+      ? `, before: "${startCursorState}"`
+      : '';
     const whereClause = getWhereClause(param);
     const orderByClause = getOrderByClause(orderBy);
 
@@ -206,5 +220,11 @@ export default function useRentedDomains(
     return data.rentals.items;
   };
 
-  return [getInitialPage, getNextPage, getPreviousPage, hasNextPageState, hasPreviousPageState];
+  return [
+    getInitialPage,
+    getNextPage,
+    getPreviousPage,
+    hasNextPageState,
+    hasPreviousPageState,
+  ];
 }

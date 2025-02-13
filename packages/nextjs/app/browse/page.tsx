@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Clock, Search, TrendingDown } from 'lucide-react';
 import { formatEther } from 'viem';
@@ -36,24 +35,6 @@ import useRentedDomains, {
 } from '~~/hooks/graphql/useRentedDomains';
 import { Domain } from '~~/types/types';
 import { EnsDappLink } from '~~/components/EnsDappLink';
-
-const EnsName = ({ address }: { address: `0x${string}` }) => {
-  const { data: ensName } = useEnsName({ address });
-
-  return ensName ? (
-    <span className="text-blue-500">
-      <Link
-        target="_blank"
-        href={`https://app.ens.domains/${ensName}`}
-        className="hover:text-blue-600 transition-all duration-300"
-      >
-        {ensName}
-      </Link>
-    </span>
-  ) : (
-    address
-  );
-};
 
 export default function Component() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -209,7 +190,7 @@ export default function Component() {
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center">
-                    <EnsName address={domain.lender as `0x${string}`} />
+                    <EnsDappLink address={domain.lender} name={domain.name} />
                   </div>
                 </TableCell>
                 <TableCell>
@@ -270,7 +251,7 @@ export default function Component() {
                 }
                 return (
                   <TableRow
-                    key={domain?.listing?.id}
+                    key={domain?.listing?.id + '-rented-table-row'}
                     className={'bg-gray-100 hover:bg-gray-100'}
                   >
                     <TableCell className="font-medium">
@@ -304,14 +285,12 @@ export default function Component() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
-                        <EnsName address={domain.borrower as `0x${string}`} />
+                        <EnsDappLink address={domain.borrower} />
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
-                        <EnsName
-                          address={domain?.listing?.lender as `0x${string}`}
-                        />
+                        <EnsDappLink address={domain?.listing?.lender} />
                       </div>
                     </TableCell>
                     <TableCell>

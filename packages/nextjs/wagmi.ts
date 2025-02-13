@@ -24,7 +24,7 @@ if (!process.env.NEXT_PUBLIC_ENS_GRAPHQL_URL) {
 }
 
 export const config = getDefaultConfig({
-  appName: 'ENS Rental',
+  appName: 'ens.rent',
   projectId: 'YOUR_PROJECT_ID',
   chains: [
     {
