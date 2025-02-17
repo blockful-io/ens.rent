@@ -122,14 +122,14 @@ export default function DomainBuy() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 p-4 flex items-center justify-center">
         <Card className="w-full max-w-md bg-white">
           <CardHeader>
             <CardTitle>Loading...</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 "></div>
             </div>
           </CardContent>
         </Card>
@@ -139,7 +139,7 @@ export default function DomainBuy() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100  p-4 flex items-center justify-center">
         <Card className="w-full max-w-md bg-white">
           <CardHeader>
             <CardTitle className="text-red-500">Error</CardTitle>
@@ -159,7 +159,7 @@ export default function DomainBuy() {
 
   if (!listing) {
     return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 p-4 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>No Listing Found</CardTitle>
@@ -185,7 +185,7 @@ export default function DomainBuy() {
   const maxDate = new Date(Number(listing.maxRentalTime) * 1000);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-100 p-4">
       <div className="mx-auto max-w-4xl space-y-6">
         {/* Back button */}
         <Button
@@ -199,9 +199,7 @@ export default function DomainBuy() {
 
         {/* Domain Info */}
         <div className="text-center">
-          <h1 className="mb-2 text-3xl font-bold text-gray-800 dark:text-white">
-            {domain}
-          </h1>
+          <h1 className="mb-2 text-3xl font-bold text-gray-800">{domain}</h1>
         </div>
 
         {/* Main info card */}
@@ -209,7 +207,7 @@ export default function DomainBuy() {
           <div className="grid grid-cols-1 gap-8">
             <div className="space-y-6">
               <div className="space-y-4">
-                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-4 ">
                   <div className="flex items-center gap-2">
                     <Tag className="size-5 text-blue-500" />
                     <span className="text-lg font-medium">Price per Year</span>
@@ -219,7 +217,7 @@ export default function DomainBuy() {
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-4 ">
                   <div className="flex items-center gap-2">
                     <Tag className="size-5 text-blue-500" />
                     <span className="text-lg font-medium">
@@ -232,7 +230,7 @@ export default function DomainBuy() {
                 </div>
 
                 {!isSeller && (
-                  <div className="flex items-center justify-between rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+                  <div className="flex items-center justify-between rounded-lg bg-gray-50 p-4 ">
                     <div className="flex items-center gap-2">
                       <Tag className="size-5 text-blue-500" />
                       <span className="text-lg font-medium">Total Price</span>
@@ -243,7 +241,7 @@ export default function DomainBuy() {
                   </div>
                 )}
 
-                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-4 ">
                   <div className="flex items-center gap-2">
                     <Clock className="size-5 text-blue-500" />
                     <span className="text-lg font-medium">End Date</span>
@@ -253,7 +251,7 @@ export default function DomainBuy() {
                       <input
                         type="date"
                         value={maxDate.toISOString().split('T')[0]}
-                        className="px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        className="px-3 py-2 border rounded-md"
                         disabled
                       />
                     </p>
@@ -264,14 +262,14 @@ export default function DomainBuy() {
                       min={minDate}
                       max={maxDate.toISOString().split('T')[0]}
                       onChange={handleDateChange}
-                      className="px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className="px-3 py-2 border rounded-md"
                     />
                   )}
                 </div>
               </div>
 
               {!isSeller && (
-                <Alert className="bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
+                <Alert className="bg-blue-50 text-blue-700">
                   <AlertCircle className="size-4" />
                   <AlertTitle>First Come, First Served</AlertTitle>
                   <AlertDescription>
@@ -343,7 +341,7 @@ export default function DomainBuy() {
 
               {!isSeller && (
                 <div className="rounded-lg border p-4">
-                  <h2 className="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <h2 className="mb-2 text-sm font-medium text-gray-500">
                     Listed by
                   </h2>
                   <p className="font-medium">{listing.lender}</p>

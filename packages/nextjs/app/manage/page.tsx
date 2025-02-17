@@ -143,14 +143,14 @@ export default function RegisteredDomains() {
 
   if (isLoadingAvailables || isLoadingListings || isLoading || isUnlisting) {
     return (
-      <div className="min-h-screen  dark:bg-gray-900 p-4 flex items-center justify-center">
+      <div className="min-h-screen p-4 flex items-center justify-center">
         <Card className="w-full max-w-md bg-white">
           <CardHeader>
             <CardTitle>Loading...</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
             </div>
           </CardContent>
         </Card>
@@ -160,7 +160,7 @@ export default function RegisteredDomains() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 p-4 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="text-red-500">Error</CardTitle>
@@ -179,7 +179,7 @@ export default function RegisteredDomains() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
+    <div className="min-h-screen bg-gray-100 p-4">
       <div className="container mx-auto py-8 ">
         <Card className="bg-white">
           <CardHeader>

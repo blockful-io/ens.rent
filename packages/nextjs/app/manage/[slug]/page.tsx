@@ -45,7 +45,7 @@ export default function RentedDomainDetails() {
 
   if (isLoading || !rental) {
     return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
+      <div className="min-h-screen bg-gray-100 p-4">
         <div className="container mx-auto py-8 max-w-4xl space-y-6">
           <Button
             variant="ghost"
@@ -66,8 +66,8 @@ export default function RentedDomainDetails() {
               </div>
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center py-8">
-              <Loader2 className="size-12 animate-spin text-blue-500 dark:text-blue-400" />
-              <p className="mt-4 text-sm text-muted-foreground dark:text-gray-300">
+              <Loader2 className="size-12 animate-spin text-blue-500" />
+              <p className="mt-4 text-sm text-muted-foreground">
                 Please wait while we prepare your content
               </p>
             </CardContent>
@@ -78,7 +78,7 @@ export default function RentedDomainDetails() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
+    <div className="min-h-screen bg-gray-100 p-4">
       <div className="container mx-auto py-8 max-w-4xl space-y-6">
         <Button
           variant="ghost"
@@ -110,8 +110,8 @@ export default function RentedDomainDetails() {
             {/* Key Information Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
-                <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
-                  <div className="flex items-center gap-2 mb-2 text-sm text-gray-500 dark:text-gray-400">
+                <div className="p-4 rounded-lg bg-gray-50">
+                  <div className="flex items-center gap-2 mb-2 text-sm text-gray-500">
                     <Wallet className="w-4 h-4" />
                     <span>Rental Price Per Year</span>
                   </div>
@@ -121,8 +121,8 @@ export default function RentedDomainDetails() {
                       : '-'}
                   </div>
                 </div>
-                <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
-                  <div className="flex items-center gap-2 mb-2 text-sm text-gray-500 dark:text-gray-400">
+                <div className="p-4 rounded-lg bg-gray-50">
+                  <div className="flex items-center gap-2 mb-2 text-sm text-gray-500">
                     <Timer className="w-4 h-4" />
                     <span>Time Remaining</span>
                   </div>
@@ -135,38 +135,34 @@ export default function RentedDomainDetails() {
               </div>
 
               <div className="space-y-4">
-                <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
-                  <div className="flex items-center gap-2 mb-2 text-sm text-gray-500 dark:text-gray-400">
+                <div className="p-4 rounded-lg bg-gray-50">
+                  <div className="flex items-center gap-2 mb-2 text-sm text-gray-500">
                     <Calendar className="w-4 h-4" />
                     <span>Rental Period</span>
                   </div>
                   <div className="space-y-1">
                     <div className="text-sm">
-                      <span className="text-gray-500 dark:text-gray-400 mr-1">
-                        Start:
-                      </span>
+                      <span className="text-gray-500 mr-1">Start:</span>
                       {rental.rentals?.length
                         ? formatDate(rental.rentals[0].startTime)
                         : '-'}
                     </div>
                     <div className="text-sm">
-                      <span className="text-gray-500 dark:text-gray-400 mr-1">
-                        End:
-                      </span>
+                      <span className="text-gray-500 mr-1">End:</span>
                       {rental.rentals?.length
                         ? formatDate(rental.rentals[0].endTime)
                         : '-'}
                     </div>
                   </div>
                 </div>
-                <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
-                  <div className="flex items-center gap-2 mb-2 text-sm text-gray-500 dark:text-gray-400">
+                <div className="p-4 rounded-lg bg-gray-50">
+                  <div className="flex items-center gap-2 mb-2 text-sm text-gray-500">
                     <User className="w-4 h-4" />
                     <span>Parties</span>
                   </div>
                   <div className="space-y-1">
                     <div className="flex gap-2 mt-2 items-center ">
-                      <span className="gap-2 text-sm text-gray-500 dark:text-gray-400">
+                      <span className="gap-2 text-sm text-gray-500">
                         Owner:
                       </span>
                       {lenderEnsName ? (
@@ -185,7 +181,7 @@ export default function RentedDomainDetails() {
                     </div>
                     {rental.hasActiveRental && (
                       <div className="flex flex-col">
-                        <span className="gap-2 mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        <span className="gap-2 mt-2 text-sm text-gray-500">
                           Renter:{' '}
                         </span>
                         {borrowerEnsName ? (

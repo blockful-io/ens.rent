@@ -335,7 +335,7 @@ export default function Component() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
+    <div className="min-h-screen bg-gray-100 p-4">
       <div className="container mx-auto py-8 flex flex-col gap-4">
         <Card className="bg-white">
           <CardHeader>
