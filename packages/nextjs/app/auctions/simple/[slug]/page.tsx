@@ -1,19 +1,29 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { AlertCircle, ArrowLeft, Clock, Tag, Wallet } from "lucide-react";
-import { formatEther, labelhash } from "viem";
-import { createWalletClient, custom, publicActions } from "viem";
-import { useAccount, usePublicClient } from "wagmi";
-import ensRentABI from "~~/abis/ensrent.json";
-import { Alert, AlertDescription, AlertTitle } from "~~/components/old-dapp/ui/alert";
-import { Button } from "~~/components/old-dapp/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "~~/components/old-dapp/ui/card";
-import useDomainData from "~~/hooks/graphql/useDomainData";
-import { useUnlistDomain } from "~~/hooks/graphql/useUnlistDomain";
-import { getEnsRentAddress } from "~~/wagmi";
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { AlertCircle, ArrowLeft, Clock, Tag, Wallet } from 'lucide-react';
+import { formatEther, labelhash } from 'viem';
+import { createWalletClient, custom, publicActions } from 'viem';
+import { useAccount, usePublicClient } from 'wagmi';
+import ensRentABI from '~~/abis/ensrent.json';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from '~~/components/old-dapp/ui/alert';
+import { Button } from '~~/components/old-dapp/ui/button';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '~~/components/old-dapp/ui/card';
+import useDomainData from '~~/hooks/graphql/useDomainData';
+import { useUnlistDomain } from '~~/hooks/graphql/useUnlistDomain';
+import { getEnsRentAddress } from '~~/wagmi';
 
 export default function DomainBuy() {
   const router = useRouter();
@@ -29,7 +39,7 @@ export default function DomainBuy() {
 
   const [listing, isLoading, error] = useDomainData(domain);
   const [duration, setDuration] = useState(
-    (new Date(selectedEndDate).getTime() - new Date().getTime()) / 1000, // difference between selected end date and now in seconds
+    (new Date(selectedEndDate).getTime() - new Date().getTime()) / 1000 // difference between selected end date and now in seconds
   );
 
   const { unlistDomain, isUnlisting } = useUnlistDomain();
@@ -42,7 +52,9 @@ export default function DomainBuy() {
 
   useEffect(() => {
     if (listing && connectedAccount) {
-      setIsSeller(connectedAccount.toLowerCase() === listing.lender.toLowerCase());
+      setIsSeller(
+        connectedAccount.toLowerCase() === listing.lender.toLowerCase()
+      );
     }
   }, [listing, connectedAccount]);
 
@@ -68,15 +80,17 @@ export default function DomainBuy() {
         chain: publicClient.chain,
       }).extend(publicActions);
 
-      const tokenId = BigInt(labelhash(domain.replace(".eth", "")));
-      const desiredEndTimestamp = BigInt(Math.floor(new Date(selectedEndDate).getTime() / 1000));
+      const tokenId = BigInt(labelhash(domain.replace('.eth', '')));
+      const desiredEndTimestamp = BigInt(
+        Math.floor(new Date(selectedEndDate).getTime() / 1000)
+      );
 
       setIsCheckingWallet(true);
 
       const { request } = await walletClient.simulateContract({
         address: ensRentAddress,
         abi: ensRentABI,
-        functionName: "rentDomain",
+        functionName: 'rentDomain',
         args: [tokenId, desiredEndTimestamp],
         value: totalPrice,
         chain: publicClient.chain,
@@ -90,7 +104,7 @@ export default function DomainBuy() {
       await walletClient.waitForTransactionReceipt({ hash });
       setIsRented(true);
     } catch (err) {
-      console.error("Error renting domain:", err);
+      console.error('Error renting domain:', err);
       // Handle error (e.g., show an error message to the user)
     } finally {
       setIsRenting(false);
@@ -103,7 +117,7 @@ export default function DomainBuy() {
     if (!domain || !connectedAccount) return;
 
     const success = await unlistDomain(connectedAccount, domain);
-    if (success) router.push("/manage");
+    if (success) router.push('/manage');
   };
 
   if (isLoading) {
@@ -134,7 +148,7 @@ export default function DomainBuy() {
             <p>{error}</p>
           </CardContent>
           <CardFooter>
-            <Button onClick={() => router.push("/")} variant="outline">
+            <Button onClick={() => router.push('/')} variant="outline">
               Return Home
             </Button>
           </CardFooter>
@@ -154,7 +168,7 @@ export default function DomainBuy() {
             <p>The requested domain listing could not be found.</p>
           </CardContent>
           <CardFooter>
-            <Button onClick={() => router.push("/")} variant="outline">
+            <Button onClick={() => router.push('/')} variant="outline">
               Return Home
             </Button>
           </CardFooter>
@@ -166,7 +180,7 @@ export default function DomainBuy() {
   // Calculate min and max dates safely
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  const minDate = tomorrow.toISOString().split("T")[0];
+  const minDate = tomorrow.toISOString().split('T')[0];
 
   const maxDate = new Date(Number(listing.maxRentalTime) * 1000);
 
@@ -174,14 +188,20 @@ export default function DomainBuy() {
     <div className="min-h-screen bg-gray-100 p-4 dark:bg-gray-900">
       <div className="mx-auto max-w-4xl space-y-6">
         {/* Back button */}
-        <Button variant="ghost" className="flex items-center gap-2" onClick={() => router.push("/browse")}>
+        <Button
+          variant="ghost"
+          className="flex items-center gap-2"
+          onClick={() => router.push('/browse')}
+        >
           <ArrowLeft className="size-4" />
           Back to Browse
         </Button>
 
         {/* Domain Info */}
         <div className="text-center">
-          <h1 className="mb-2 text-3xl font-bold text-gray-800 dark:text-white">{domain}</h1>
+          <h1 className="mb-2 text-3xl font-bold text-gray-800 dark:text-white">
+            {domain}
+          </h1>
         </div>
 
         {/* Main info card */}
@@ -194,15 +214,21 @@ export default function DomainBuy() {
                     <Tag className="size-5 text-blue-500" />
                     <span className="text-lg font-medium">Price per Year</span>
                   </div>
-                  <span className="text-2xl font-bold">{formatEther(pricePerYear)} ETH</span>
+                  <span className="text-2xl font-bold">
+                    {formatEther(pricePerYear)} ETH
+                  </span>
                 </div>
 
                 <div className="flex items-center justify-between rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
                   <div className="flex items-center gap-2">
                     <Tag className="size-5 text-blue-500" />
-                    <span className="text-lg font-medium">Price per Second</span>
+                    <span className="text-lg font-medium">
+                      Price per Second
+                    </span>
                   </div>
-                  <span className="text-2xl font-bold">{formatEther(pricePerSecond)} ETH</span>
+                  <span className="text-2xl font-bold">
+                    {formatEther(pricePerSecond)} ETH
+                  </span>
                 </div>
 
                 {!isSeller && (
@@ -211,7 +237,9 @@ export default function DomainBuy() {
                       <Tag className="size-5 text-blue-500" />
                       <span className="text-lg font-medium">Total Price</span>
                     </div>
-                    <span className="text-2xl font-bold">{formatEther(BigInt(totalPrice))} ETH</span>
+                    <span className="text-2xl font-bold">
+                      {formatEther(BigInt(totalPrice))} ETH
+                    </span>
                   </div>
                 )}
 
@@ -224,7 +252,7 @@ export default function DomainBuy() {
                     <p>
                       <input
                         type="date"
-                        value={maxDate.toISOString().split("T")[0]}
+                        value={maxDate.toISOString().split('T')[0]}
                         className="px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                         disabled
                       />
@@ -232,9 +260,9 @@ export default function DomainBuy() {
                   ) : (
                     <input
                       type="date"
-                      value={selectedEndDate.toISOString().split("T")[0]}
+                      value={selectedEndDate.toISOString().split('T')[0]}
                       min={minDate}
-                      max={maxDate.toISOString().split("T")[0]}
+                      max={maxDate.toISOString().split('T')[0]}
                       onChange={handleDateChange}
                       className="px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     />
@@ -247,8 +275,8 @@ export default function DomainBuy() {
                   <AlertCircle className="size-4" />
                   <AlertTitle>First Come, First Served</AlertTitle>
                   <AlertDescription>
-                    This domain is available for immediate rental. The first person to complete the transaction will
-                    receive the domain.
+                    This domain is available for immediate rental. The first
+                    person to complete the transaction will receive the domain.
                   </AlertDescription>
                 </Alert>
               )}
@@ -260,12 +288,16 @@ export default function DomainBuy() {
                       <div>
                         <AlertTitle>Success!</AlertTitle>
                         <AlertDescription>
-                          The domain is now yours until {new Date(selectedEndDate).toLocaleDateString()}
+                          The domain is now yours until{' '}
+                          {new Date(selectedEndDate).toLocaleDateString()}
                         </AlertDescription>
                       </div>
                       <div>
                         <Button asChild>
-                          <Link target="_blank" href={`https://app.ens.domains/${domain}`}>
+                          <Link
+                            target="_blank"
+                            href={`https://app.ens.domains/${domain}`}
+                          >
                             Manage your rented domain
                           </Link>
                         </Button>
@@ -277,7 +309,11 @@ export default function DomainBuy() {
                     size="lg"
                     className="w-full"
                     onClick={handleBuy}
-                    disabled={selectedEndDate < new Date(Date.now()) || isRenting || !connectedAccount}
+                    disabled={
+                      selectedEndDate < new Date(Date.now()) ||
+                      isRenting ||
+                      !connectedAccount
+                    }
                   >
                     {isCheckingWallet ? (
                       <span className="flex items-center gap-2">
@@ -295,14 +331,21 @@ export default function DomainBuy() {
                   </Button>
                 )
               ) : (
-                <Button size="lg" className="w-full" onClick={handleCloseRental} disabled={isUnlisting}>
-                  {isUnlisting ? "Unlisting..." : "Unlist Domain"}
+                <Button
+                  size="lg"
+                  className="w-full"
+                  onClick={handleCloseRental}
+                  disabled={isUnlisting}
+                >
+                  {isUnlisting ? 'Unlisting...' : 'Unlist Domain'}
                 </Button>
               )}
 
               {!isSeller && (
                 <div className="rounded-lg border p-4">
-                  <h2 className="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Listed by</h2>
+                  <h2 className="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                    Listed by
+                  </h2>
                   <p className="font-medium">{listing.lender}</p>
                 </div>
               )}
@@ -316,11 +359,18 @@ export default function DomainBuy() {
             <CardTitle>Rental Terms</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p>• Rental period starts immediately upon successful transaction</p>
+            <p>
+              • Rental period starts immediately upon successful transaction
+            </p>
             <p>• Price is fixed and non-negotiable</p>
             <p>• Payment is required in ETH</p>
             <p>• Domain transfer will be executed automatically</p>
-            {selectedEndDate && <p>• Rental ends on: {new Date(selectedEndDate).toLocaleDateString()}</p>}
+            {selectedEndDate && (
+              <p>
+                • Rental ends on:{' '}
+                {new Date(selectedEndDate).toLocaleDateString()}
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>

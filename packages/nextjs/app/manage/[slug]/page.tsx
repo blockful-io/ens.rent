@@ -1,15 +1,30 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Calendar, ExternalLink, Loader2, Timer, User, Wallet } from "lucide-react";
-import { formatEther } from "viem";
-import { useEnsName, usePublicClient } from "wagmi";
-import { Button } from "~~/components/old-dapp/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~~/components/old-dapp/ui/card";
-import useDomainData from "~~/hooks/graphql/useDomainData";
-import { RentalStatus } from "~~/types/types";
-import { getStatusColor } from "~~/utils/old-dapp/utils";
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import {
+  ArrowLeft,
+  Calendar,
+  ExternalLink,
+  Loader2,
+  Timer,
+  User,
+  Wallet,
+} from 'lucide-react';
+import { formatEther } from 'viem';
+import { useEnsName, usePublicClient } from 'wagmi';
+import { Button } from '~~/components/old-dapp/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '~~/components/old-dapp/ui/card';
+import useDomainData from '~~/hooks/graphql/useDomainData';
+import { RentalStatus } from '~~/types/types';
+import { getStatusColor } from '~~/utils/old-dapp/utils';
 
 const SECONDS_PER_YEAR = 31536000;
 
@@ -23,7 +38,7 @@ export default function RentedDomainDetails() {
     address: rental?.lender as `0x${string}`,
   });
 
-  const address = rental?.rentals ? rental?.rentals[0]?.borrower : "0x";
+  const address = rental?.rentals ? rental?.rentals[0]?.borrower : '0x';
   const { data: borrowerEnsName } = useEnsName({
     address: address as `0x${string}`,
   });
@@ -32,7 +47,11 @@ export default function RentedDomainDetails() {
     return (
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
         <div className="container mx-auto py-8 max-w-4xl space-y-6">
-          <Button variant="ghost" className="flex items-center gap-2" onClick={() => router.back()}>
+          <Button
+            variant="ghost"
+            className="flex items-center gap-2"
+            onClick={() => router.back()}
+          >
             <ArrowLeft className="w-4 h-4" />
             Back
           </Button>
@@ -61,7 +80,11 @@ export default function RentedDomainDetails() {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
       <div className="container mx-auto py-8 max-w-4xl space-y-6">
-        <Button variant="ghost" className="flex items-center gap-2" onClick={() => router.back()}>
+        <Button
+          variant="ghost"
+          className="flex items-center gap-2"
+          onClick={() => router.back()}
+        >
           <ArrowLeft className="w-4 h-4" />
           Back
         </Button>
@@ -76,7 +99,7 @@ export default function RentedDomainDetails() {
               </div>
               <div
                 className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${getStatusColor(
-                  rental.status,
+                  rental.status
                 )}`}
               >
                 {rental.status}
@@ -93,7 +116,9 @@ export default function RentedDomainDetails() {
                     <span>Rental Price Per Year</span>
                   </div>
                   <div className="text-2xl font-bold">
-                    {rental.price ? `${formatEther(BigInt(rental.price) * BigInt(SECONDS_PER_YEAR))} ETH` : "-"}
+                    {rental.price
+                      ? `${formatEther(BigInt(rental.price) * BigInt(SECONDS_PER_YEAR))} ETH`
+                      : '-'}
                   </div>
                 </div>
                 <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
@@ -102,7 +127,9 @@ export default function RentedDomainDetails() {
                     <span>Time Remaining</span>
                   </div>
                   <div className="text-2xl font-bold">
-                    {rental.maxRentalTime ? getRemainingTime(rental.maxRentalTime) : "-"}
+                    {rental.maxRentalTime
+                      ? getRemainingTime(rental.maxRentalTime)
+                      : '-'}
                   </div>
                 </div>
               </div>
@@ -115,12 +142,20 @@ export default function RentedDomainDetails() {
                   </div>
                   <div className="space-y-1">
                     <div className="text-sm">
-                      <span className="text-gray-500 dark:text-gray-400 mr-1">Start:</span>
-                      {rental.rentals?.length ? formatDate(rental.rentals[0].startTime) : "-"}
+                      <span className="text-gray-500 dark:text-gray-400 mr-1">
+                        Start:
+                      </span>
+                      {rental.rentals?.length
+                        ? formatDate(rental.rentals[0].startTime)
+                        : '-'}
                     </div>
                     <div className="text-sm">
-                      <span className="text-gray-500 dark:text-gray-400 mr-1">End:</span>
-                      {rental.rentals?.length ? formatDate(rental.rentals[0].endTime) : "-"}
+                      <span className="text-gray-500 dark:text-gray-400 mr-1">
+                        End:
+                      </span>
+                      {rental.rentals?.length
+                        ? formatDate(rental.rentals[0].endTime)
+                        : '-'}
                     </div>
                   </div>
                 </div>
@@ -131,7 +166,9 @@ export default function RentedDomainDetails() {
                   </div>
                   <div className="space-y-1">
                     <div className="flex gap-2 mt-2 items-center ">
-                      <span className="gap-2 text-sm text-gray-500 dark:text-gray-400">Owner:</span>
+                      <span className="gap-2 text-sm text-gray-500 dark:text-gray-400">
+                        Owner:
+                      </span>
                       {lenderEnsName ? (
                         <div className="flex justify-center gap-2">
                           <Link
@@ -148,7 +185,9 @@ export default function RentedDomainDetails() {
                     </div>
                     {rental.hasActiveRental && (
                       <div className="flex flex-col">
-                        <span className="gap-2 mt-2 text-sm text-gray-500 dark:text-gray-400">Renter: </span>
+                        <span className="gap-2 mt-2 text-sm text-gray-500 dark:text-gray-400">
+                          Renter:{' '}
+                        </span>
                         {borrowerEnsName ? (
                           <div>
                             <Link
@@ -160,7 +199,9 @@ export default function RentedDomainDetails() {
                             </Link>
                           </div>
                         ) : (
-                          <span className="text-sm">{rental.rentals?.[0].borrower}</span>
+                          <span className="text-sm">
+                            {rental.rentals?.[0].borrower}
+                          </span>
                         )}
                       </div>
                     )}
@@ -175,12 +216,13 @@ export default function RentedDomainDetails() {
               onClick={() => {
                 window.open(
                   `${client!.chain!.blockExplorers!.default.url}/tx/${
-                    (rental.status === RentalStatus.rentedOut || rental.status === RentalStatus.rentedIn) &&
+                    (rental.status === RentalStatus.rentedOut ||
+                      rental.status === RentalStatus.rentedIn) &&
                     rental.rentals?.length
                       ? rental.rentals?.[0].id
                       : rental.id
                   }`,
-                  "_blank",
+                  '_blank'
                 );
               }}
               className="flex items-center gap-2"
@@ -189,7 +231,11 @@ export default function RentedDomainDetails() {
               View on Etherscan
             </Button>
             <Button asChild>
-              <Link className="flex items-center gap-2" target="_blank" href={`https://app.ens.domains/${domain}`}>
+              <Link
+                className="flex items-center gap-2"
+                target="_blank"
+                href={`https://app.ens.domains/${domain}`}
+              >
                 <ExternalLink className="w-4 h-4" />
                 Manage your rented domain
               </Link>
@@ -201,10 +247,10 @@ export default function RentedDomainDetails() {
   );
 }
 const formatDate = (date: number): string => {
-  return new Date(date).toLocaleString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+  return new Date(date).toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   });
 };
 
@@ -215,7 +261,7 @@ const getRemainingTime = (endDate: string) => {
 
   // Return early if already expired
   if (diff <= 0) {
-    return "Expired";
+    return 'Expired';
   }
 
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));

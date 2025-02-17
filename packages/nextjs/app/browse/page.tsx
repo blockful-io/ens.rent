@@ -251,7 +251,11 @@ export default function Component() {
                 }
                 return (
                   <TableRow
-                    key={domain?.listing?.id + '-rented-table-row'}
+                    key={
+                      domain.listing.price +
+                      domain.listing.name +
+                      domain.startTime
+                    }
                     className={'bg-gray-100 hover:bg-gray-100'}
                   >
                     <TableCell className="font-medium">
