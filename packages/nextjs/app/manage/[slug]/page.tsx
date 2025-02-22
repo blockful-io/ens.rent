@@ -25,6 +25,7 @@ import {
 import useDomainData from '~~/hooks/graphql/useDomainData';
 import { RentalStatus } from '~~/types/types';
 import { getStatusColor } from '~~/utils/old-dapp/utils';
+import { EthToUsdValue } from '~~/components/EthToEthValue';
 
 const SECONDS_PER_YEAR = 31536000;
 
@@ -116,9 +117,17 @@ export default function RentedDomainDetails() {
                     <span>Rental Price Per Year</span>
                   </div>
                   <div className="text-2xl font-bold">
-                    {rental.price
-                      ? `${formatEther(BigInt(rental.price) * BigInt(SECONDS_PER_YEAR))} ETH`
-                      : '-'}
+                    {rental.price ? (
+                      <EthToUsdValue
+                        ethAmount={Number(
+                          formatEther(
+                            BigInt(rental.price) * BigInt(SECONDS_PER_YEAR)
+                          )
+                        )}
+                      />
+                    ) : (
+                      '-'
+                    )}
                   </div>
                 </div>
                 <div className="p-4 rounded-lg bg-gray-50">

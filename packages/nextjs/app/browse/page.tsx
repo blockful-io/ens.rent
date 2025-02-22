@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Clock, Search, TrendingDown } from 'lucide-react';
 import { formatEther } from 'viem';
-import { useAccount, useChainId, useEnsName } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
+import { useCurrency } from '~~/contexts/CurrencyContext';
 import { Button } from '~~/components/old-dapp/ui/button';
 import {
   Card,
@@ -35,6 +36,7 @@ import useRentedDomains, {
 } from '~~/hooks/graphql/useRentedDomains';
 import { Domain } from '~~/types/types';
 import { EnsDappLink } from '~~/components/EnsDappLink';
+import { EthToUsdValue } from '~~/components/EthToEthValue';
 
 export default function Component() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -155,6 +157,18 @@ export default function Component() {
   const filteredDomains = availableDomains;
   const rentedFilteredDomains = rentedDomains;
 
+  const { ethPrice, preferredCurrency } = useCurrency();
+
+  const formatPrice = (priceInEth: number) => {
+    if (preferredCurrency === 'ETH') {
+      return `${priceInEth.toFixed(4)} ETH`;
+    }
+    const priceInUsd = priceInEth * ethPrice;
+    return `$${priceInUsd.toFixed(2)}`;
+  };
+
+  console.log('ethPrice', ethPrice);
+
   const TableView = () => (
     <div className="flex flex-col gap-4">
       <div className="rounded-md border overflow-hidden">
@@ -177,7 +191,7 @@ export default function Component() {
                 <TableCell>
                   <div className="flex items-center">
                     <TrendingDown className="w-4 h-4 text-green-500 mr-2" />
-                    {domain.price} ETH
+                    <EthToUsdValue ethAmount={domain.price || 0} />
                   </div>
                 </TableCell>
                 <TableCell>
@@ -264,11 +278,14 @@ export default function Component() {
                     <TableCell>
                       <div className="flex items-center">
                         <TrendingDown className="w-4 h-4 text-green-500 mr-2" />
-                        {formatEther(
-                          BigInt(domain?.listing?.price || 0) *
-                            BigInt(365 * 24 * 60 * 60)
-                        )}
-                        ETH
+                        <EthToUsdValue
+                          ethAmount={Number(
+                            formatEther(
+                              BigInt(domain?.listing?.price || 0) *
+                                BigInt(365 * 24 * 60 * 60)
+                            )
+                          )}
+                        />
                       </div>
                     </TableCell>
                     <TableCell>

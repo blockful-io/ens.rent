@@ -38,6 +38,7 @@ import useDomainsByAddress from '~~/hooks/graphql/useDomains';
 import { getEnsRentAddress } from '~~/wagmi';
 import { getChainContractAddress } from '@ensdomains/ensjs/contracts';
 import { mainnet } from 'viem/chains';
+import { EthToUsdValue } from '~~/components/EthToEthValue';
 
 const ONE_YEAR_IN_SECONDS = 31536000;
 
@@ -320,7 +321,8 @@ function LendPage() {
                 />
                 {!!price && (
                   <p className="text-sm text-gray-500 mt-1">
-                    Price per second: {formatEther(pricePerSecond)} ETH
+                    Price per second:{' '}
+                    <EthToUsdValue ethAmount={Number(pricePerSecond)} />
                   </p>
                 )}
               </div>

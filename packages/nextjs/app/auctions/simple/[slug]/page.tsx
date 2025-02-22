@@ -24,6 +24,7 @@ import {
 import useDomainData from '~~/hooks/graphql/useDomainData';
 import { useUnlistDomain } from '~~/hooks/graphql/useUnlistDomain';
 import { getEnsRentAddress } from '~~/wagmi';
+import { EthToUsdValue } from '~~/components/EthToEthValue';
 
 export default function DomainBuy() {
   const router = useRouter();
@@ -212,9 +213,7 @@ export default function DomainBuy() {
                     <Tag className="size-5 text-blue-500" />
                     <span className="text-lg font-medium">Price per Year</span>
                   </div>
-                  <span className="text-2xl font-bold">
-                    {formatEther(pricePerYear)} ETH
-                  </span>
+                  <EthToUsdValue ethAmount={Number(pricePerYear)} />
                 </div>
 
                 <div className="flex items-center justify-between rounded-lg bg-gray-50 p-4 ">
@@ -224,9 +223,7 @@ export default function DomainBuy() {
                       Price per Second
                     </span>
                   </div>
-                  <span className="text-2xl font-bold">
-                    {formatEther(pricePerSecond)} ETH
-                  </span>
+                  <EthToUsdValue ethAmount={Number(pricePerSecond)} />
                 </div>
 
                 {!isSeller && (
@@ -235,9 +232,7 @@ export default function DomainBuy() {
                       <Tag className="size-5 text-blue-500" />
                       <span className="text-lg font-medium">Total Price</span>
                     </div>
-                    <span className="text-2xl font-bold">
-                      {formatEther(BigInt(totalPrice))} ETH
-                    </span>
+                    <EthToUsdValue ethAmount={Number(totalPrice)} />
                   </div>
                 )}
 
@@ -324,7 +319,10 @@ export default function DomainBuy() {
                         Processing transaction...
                       </span>
                     ) : (
-                      `Rent Now for ${formatEther(totalPrice)} ETH`
+                      <>
+                        Rent Now for{' '}
+                        <EthToUsdValue ethAmount={Number(totalPrice)} />
+                      </>
                     )}
                   </Button>
                 )

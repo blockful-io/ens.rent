@@ -45,6 +45,7 @@ import { useUnlistDomain } from '~~/hooks/graphql/useUnlistDomain';
 import { Domain, RentalStatus } from '~~/types/types';
 import { getStatusColor } from '~~/utils/old-dapp/utils';
 import { EnsDappLink } from '~~/components/EnsDappLink';
+import { EthToUsdValue } from '~~/components/EthToEthValue';
 
 export default function RegisteredDomains() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -296,7 +297,7 @@ export default function RegisteredDomains() {
                       <TableHead className="hidden md:table-cell">
                         Current Renter
                       </TableHead>
-                      <TableHead>Rental Price</TableHead>
+                      <TableHead>Rental Price per Year</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -317,14 +318,15 @@ export default function RegisteredDomains() {
                                   <span>
                                     {new Date(
                                       parseInt(
-                                        domain.rentals?.[0]?.endTime.toString() ||
+                                        domain.rentals?.[0]?.endTime?.toString() ||
                                           domain.maxRentalTime ||
                                           '0'
                                       ) * 1000
                                     ).toLocaleDateString()}
                                   </span>
                                   <span className="text-xs text-gray-500">
-                                    {domain?.rentals?.[0]?.endTime.toString()
+                                    {domain?.rentals?.[0]?.endTime &&
+                                    domain?.rentals?.[0]?.endTime.toString()
                                       ? getTimeUntilExpiry(
                                           domain?.rentals?.[0]?.endTime.toString()
                                         ) < 0
@@ -376,9 +378,14 @@ export default function RegisteredDomains() {
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <Tag className="h-4 w-4 text-gray-500" />
-                              {domain.price
-                                ? `${formatEther(BigInt(domain.price))} ETH`
-                                : '-'}
+                              <EthToUsdValue
+                                ethAmount={Number(
+                                  formatEther(
+                                    BigInt(domain.price || 0) *
+                                      BigInt(365 * 24 * 60 * 60)
+                                  )
+                                )}
+                              />
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
