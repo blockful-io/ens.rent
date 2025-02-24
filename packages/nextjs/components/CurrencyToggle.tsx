@@ -1,6 +1,6 @@
 'use client';
 
-import { useCurrency } from '~~/contexts/CurrencyContext';
+import { Currency, useCurrency } from '~~/contexts/CurrencyContext';
 
 type Props = {
   size?: 'extraSmall' | 'small' | 'medium';
@@ -23,7 +23,9 @@ export const CurrencyToggle = ({ size = 'medium', className = '' }: Props) => {
         ${sizeClasses[size]} ${className}
       `}
       onClick={() =>
-        setPreferredCurrency(preferredCurrency === 'ETH' ? 'USD' : 'ETH')
+        setPreferredCurrency(
+          preferredCurrency === Currency.ETH ? Currency.USD : Currency.ETH
+        )
       }
     >
       <div

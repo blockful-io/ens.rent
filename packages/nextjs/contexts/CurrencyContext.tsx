@@ -6,7 +6,7 @@ import React, {
   ReactNode,
 } from 'react';
 
-enum Currency {
+export enum Currency {
   USD = 'USD',
   ETH = 'ETH',
 }
