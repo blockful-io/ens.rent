@@ -38,7 +38,7 @@ import useDomainsByAddress from '~~/hooks/graphql/useDomains';
 import { getEnsRentAddress } from '~~/wagmi';
 import { getChainContractAddress } from '@ensdomains/ensjs/contracts';
 import { mainnet } from 'viem/chains';
-import { EthToUsdValue } from '~~/components/EthToEthValue';
+import { EthToUsdValue } from '~~/components/EthToUsdValue';
 
 const ONE_YEAR_IN_SECONDS = 31536000;
 

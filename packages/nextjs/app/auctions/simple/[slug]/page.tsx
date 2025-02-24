@@ -24,7 +24,7 @@ import {
 import useDomainData from '~~/hooks/graphql/useDomainData';
 import { useUnlistDomain } from '~~/hooks/graphql/useUnlistDomain';
 import { getEnsRentAddress } from '~~/wagmi';
-import { EthToUsdValue } from '~~/components/EthToEthValue';
+import { EthToUsdValue } from '~~/components/EthToUsdValue';
 
 export default function DomainBuy() {
   const router = useRouter();

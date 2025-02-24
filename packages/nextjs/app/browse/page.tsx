@@ -36,7 +36,8 @@ import useRentedDomains, {
 } from '~~/hooks/graphql/useRentedDomains';
 import { Domain } from '~~/types/types';
 import { EnsDappLink } from '~~/components/EnsDappLink';
-import { EthToUsdValue } from '~~/components/EthToEthValue';
+import { EthToUsdValue } from '~~/components/EthToUsdValue';
+import { SECONDS_PER_YEAR } from '~~/utils/old-dapp/utils';
 
 export default function Component() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -167,8 +168,6 @@ export default function Component() {
     return `$${priceInUsd.toFixed(2)}`;
   };
 
-  console.log('ethPrice', ethPrice);
-
   const TableView = () => (
     <div className="flex flex-col gap-4">
       <div className="rounded-md border overflow-hidden">
@@ -282,7 +281,7 @@ export default function Component() {
                           ethAmount={Number(
                             formatEther(
                               BigInt(domain?.listing?.price || 0) *
-                                BigInt(365 * 24 * 60 * 60)
+                                BigInt(SECONDS_PER_YEAR)
                             )
                           )}
                         />

@@ -6,10 +6,15 @@ import React, {
   ReactNode,
 } from 'react';
 
+enum Currency {
+  USD = 'USD',
+  ETH = 'ETH',
+}
+
 interface CurrencyContextType {
   ethPrice: number;
-  preferredCurrency: 'USD' | 'ETH';
-  setPreferredCurrency: (currency: 'USD' | 'ETH') => void;
+  preferredCurrency: Currency;
+  setPreferredCurrency: (currency: Currency) => void;
 }
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(
@@ -18,8 +23,8 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(
 
 export function CurrencyProvider({ children }: { children: ReactNode }) {
   const [ethPrice, setEthPrice] = useState<number>(0);
-  const [preferredCurrency, setPreferredCurrency] = useState<'USD' | 'ETH'>(
-    'USD'
+  const [preferredCurrency, setPreferredCurrency] = useState<Currency>(
+    Currency.USD
   );
 
   useEffect(() => {

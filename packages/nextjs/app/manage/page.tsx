@@ -43,9 +43,9 @@ import useDomainsByAddress from '~~/hooks/graphql/useDomains';
 import useListings from '~~/hooks/graphql/useListings';
 import { useUnlistDomain } from '~~/hooks/graphql/useUnlistDomain';
 import { Domain, RentalStatus } from '~~/types/types';
-import { getStatusColor } from '~~/utils/old-dapp/utils';
+import { getStatusColor, SECONDS_PER_YEAR } from '~~/utils/old-dapp/utils';
 import { EnsDappLink } from '~~/components/EnsDappLink';
-import { EthToUsdValue } from '~~/components/EthToEthValue';
+import { EthToUsdValue } from '~~/components/EthToUsdValue';
 
 export default function RegisteredDomains() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -382,7 +382,7 @@ export default function RegisteredDomains() {
                                 ethAmount={Number(
                                   formatEther(
                                     BigInt(domain.price || 0) *
-                                      BigInt(365 * 24 * 60 * 60)
+                                      BigInt(SECONDS_PER_YEAR)
                                   )
                                 )}
                               />

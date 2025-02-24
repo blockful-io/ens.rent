@@ -29,3 +29,5 @@ export const getStatusColor = (status: RentalStatus) => {
       return 'bg-gray-100 text-gray-700';
   }
 };
+
+export const SECONDS_PER_YEAR = 31536000;

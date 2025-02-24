@@ -24,10 +24,8 @@ import {
 } from '~~/components/old-dapp/ui/card';
 import useDomainData from '~~/hooks/graphql/useDomainData';
 import { RentalStatus } from '~~/types/types';
-import { getStatusColor } from '~~/utils/old-dapp/utils';
-import { EthToUsdValue } from '~~/components/EthToEthValue';
-
-const SECONDS_PER_YEAR = 31536000;
+import { getStatusColor, SECONDS_PER_YEAR } from '~~/utils/old-dapp/utils';
+import { EthToUsdValue } from '~~/components/EthToUsdValue';
 
 export default function RentedDomainDetails() {
   const router = useRouter();
