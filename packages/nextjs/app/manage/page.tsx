@@ -43,8 +43,9 @@ import useDomainsByAddress from '~~/hooks/graphql/useDomains';
 import useListings from '~~/hooks/graphql/useListings';
 import { useUnlistDomain } from '~~/hooks/graphql/useUnlistDomain';
 import { Domain, RentalStatus } from '~~/types/types';
-import { getStatusColor } from '~~/utils/old-dapp/utils';
+import { getStatusColor, SECONDS_PER_YEAR } from '~~/utils/old-dapp/utils';
 import { EnsDappLink } from '~~/components/EnsDappLink';
+import { EthToUsdValue } from '~~/components/EthToUsdValue';
 
 export default function RegisteredDomains() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -143,14 +144,14 @@ export default function RegisteredDomains() {
 
   if (isLoadingAvailables || isLoadingListings || isLoading || isUnlisting) {
     return (
-      <div className="min-h-screen  dark:bg-gray-900 p-4 flex items-center justify-center">
+      <div className="min-h-screen p-4 flex items-center justify-center">
         <Card className="w-full max-w-md bg-white">
           <CardHeader>
             <CardTitle>Loading...</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
             </div>
           </CardContent>
         </Card>
@@ -160,7 +161,7 @@ export default function RegisteredDomains() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 p-4 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="text-red-500">Error</CardTitle>
@@ -179,7 +180,7 @@ export default function RegisteredDomains() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
+    <div className="min-h-screen bg-gray-100 p-4">
       <div className="container mx-auto py-8 ">
         <Card className="bg-white">
           <CardHeader>
@@ -296,7 +297,7 @@ export default function RegisteredDomains() {
                       <TableHead className="hidden md:table-cell">
                         Current Renter
                       </TableHead>
-                      <TableHead>Rental Price</TableHead>
+                      <TableHead>Rental Price per Year</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -317,14 +318,15 @@ export default function RegisteredDomains() {
                                   <span>
                                     {new Date(
                                       parseInt(
-                                        domain.rentals?.[0]?.endTime.toString() ||
+                                        domain.rentals?.[0]?.endTime?.toString() ||
                                           domain.maxRentalTime ||
                                           '0'
                                       ) * 1000
                                     ).toLocaleDateString()}
                                   </span>
                                   <span className="text-xs text-gray-500">
-                                    {domain?.rentals?.[0]?.endTime.toString()
+                                    {domain?.rentals?.[0]?.endTime &&
+                                    domain?.rentals?.[0]?.endTime.toString()
                                       ? getTimeUntilExpiry(
                                           domain?.rentals?.[0]?.endTime.toString()
                                         ) < 0
@@ -376,9 +378,14 @@ export default function RegisteredDomains() {
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <Tag className="h-4 w-4 text-gray-500" />
-                              {domain.price
-                                ? `${formatEther(BigInt(domain.price))} ETH`
-                                : '-'}
+                              <EthToUsdValue
+                                ethAmount={Number(
+                                  formatEther(
+                                    BigInt(domain.price || 0) *
+                                      BigInt(SECONDS_PER_YEAR)
+                                  )
+                                )}
+                              />
                             </div>
                           </TableCell>
                           <TableCell className="text-right">

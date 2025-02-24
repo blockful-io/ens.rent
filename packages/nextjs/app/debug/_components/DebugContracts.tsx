@@ -1,23 +1,27 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo } from "react";
-import { useSessionStorage } from "usehooks-ts";
-import { BarsArrowUpIcon } from "@heroicons/react/20/solid";
-import { ContractUI } from "~~/app/debug/_components/contract";
-import { ContractName, GenericContract } from "~~/utils/scaffold-eth/contract";
-import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
+import { useEffect, useMemo } from 'react';
+import { useSessionStorage } from 'usehooks-ts';
+import { BarsArrowUpIcon } from '@heroicons/react/20/solid';
+import { ContractUI } from '~~/app/debug/_components/contract';
+import { ContractName, GenericContract } from '~~/utils/scaffold-eth/contract';
+import { useAllContracts } from '~~/utils/scaffold-eth/contractsData';
 
-const selectedContractStorageKey = "scaffoldEth2.selectedContract";
+const selectedContractStorageKey = 'scaffoldEth2.selectedContract';
 
 export function DebugContracts() {
   const contractsData = useAllContracts();
-  const contractNames = useMemo(() => Object.keys(contractsData) as ContractName[], [contractsData]);
-
-  const [selectedContract, setSelectedContract] = useSessionStorage<ContractName>(
-    selectedContractStorageKey,
-    contractNames[0],
-    { initializeWithValue: false },
+  const contractNames = useMemo(
+    () => Object.keys(contractsData) as ContractName[],
+    [contractsData]
   );
+
+  const [selectedContract, setSelectedContract] =
+    useSessionStorage<ContractName>(
+      selectedContractStorageKey,
+      contractNames[0],
+      { initializeWithValue: false }
+    );
 
   useEffect(() => {
     if (!contractNames.includes(selectedContract)) {
@@ -33,19 +37,23 @@ export function DebugContracts() {
         <>
           {contractNames.length > 1 && (
             <div className="flex flex-row gap-2 w-full max-w-7xl pb-1 px-6 lg:px-10 flex-wrap">
-              {contractNames.map(contractName => (
+              {contractNames.map((contractName) => (
                 <button
                   className={`btn btn-secondary btn-sm font-light hover:border-transparent ${
                     contractName === selectedContract
-                      ? "bg-base-300 hover:bg-base-300 no-animation"
-                      : "bg-base-100 hover:bg-secondary"
+                      ? 'bg-base-300 hover:bg-base-300 no-animation'
+                      : 'bg-base-100 hover:bg-secondary'
                   }`}
                   key={contractName}
                   onClick={() => setSelectedContract(contractName)}
                 >
                   {contractName}
-                  {(contractsData[contractName] as GenericContract)?.external && (
-                    <span className="tooltip tooltip-top tooltip-accent" data-tip="External contract">
+                  {(contractsData[contractName] as GenericContract)
+                    ?.external && (
+                    <span
+                      className="tooltip tooltip-top tooltip-accent"
+                      data-tip="External contract"
+                    >
                       <BarsArrowUpIcon className="h-4 w-4 cursor-pointer" />
                     </span>
                   )}
@@ -53,11 +61,11 @@ export function DebugContracts() {
               ))}
             </div>
           )}
-          {contractNames.map(contractName => (
+          {contractNames.map((contractName) => (
             <ContractUI
               key={contractName}
               contractName={contractName}
-              className={contractName === selectedContract ? "" : "hidden"}
+              className={contractName === selectedContract ? '' : 'hidden'}
             />
           ))}
         </>

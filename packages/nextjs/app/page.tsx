@@ -15,14 +15,12 @@ import {
 
 const Home: NextPage = () => {
   return (
-    <div className="h-[calc(100vh-65px)] bg-base-100 bg-gradient-to-b from-blue-100 to-white dark:from-gray-900 dark:to-gray-800">
+    <div className="h-[calc(100vh-65px)] bg-base-100 bg-gradient-to-b from-blue-100 to-white">
       {/* Main Content */}
       <main className="container mx-auto px-4 py-12">
         {/* Welcome Section */}
         <div className="mb-12 text-center">
-          <h1 className="mb-4 text-4xl font-bold dark:text-white">
-            Welcome to ens.rent
-          </h1>
+          <h1 className="mb-4 text-4xl font-bold">Welcome to ens.rent</h1>
           <p className="mx-auto max-w-2xl text-lg text-muted-foreground text-gray-500">
             Your platform for renting and listing ENS domains. Choose whether
             you want to rent a domain or list your domains for others to rent.
@@ -35,7 +33,7 @@ const Home: NextPage = () => {
           <Card className="flex flex-col transition-shadow hover:shadow-lg bg-white">
             <CardHeader>
               <div className="flex items-center space-x-2">
-                <ShoppingBag className="size-6 text-blue-500 dark:text-blue-400" />
+                <ShoppingBag className="size-6 text-blue-500 " />
                 <CardTitle>Rent a Domain</CardTitle>
               </div>
               <CardDescription className="text-gray-500">
@@ -44,7 +42,7 @@ const Home: NextPage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
-              <div className="space-y-2 text-sm dark:text-gray-300">
+              <div className="space-y-2 text-sm">
                 <div className="flex items-center">
                   <span className="mr-2">✓</span>
                   Browse available domains
@@ -78,7 +76,7 @@ const Home: NextPage = () => {
           <Card className="flex flex-col transition-shadow hover:shadow-lg bg-white">
             <CardHeader>
               <div className="flex items-center space-x-2">
-                <Tag className="size-6 text-green-500 dark:text-green-400" />
+                <Tag className="size-6 text-green-500" />
                 <CardTitle>List Your Domains</CardTitle>
               </div>
               <CardDescription className="text-gray-500">
@@ -86,7 +84,7 @@ const Home: NextPage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
-              <div className="space-y-2 text-sm dark:text-gray-300">
+              <div className="space-y-2 text-sm ">
                 <div className="flex items-center">
                   <span className="mr-2">✓</span>
                   Set your rental terms
@@ -120,40 +118,32 @@ const Home: NextPage = () => {
 
         {/* Info Section */}
         <div className="mt-8 text-center">
-          <h2 className="mb-4 text-2xl font-semibold dark:text-white">
-            How It Works
-          </h2>
+          <h2 className="mb-4 text-2xl font-semibold ">How It Works</h2>
           <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-3">
             <div>
-              <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
-                <Wallet className="size-6 text-blue-600 dark:text-blue-400" />
+              <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-blue-100 ">
+                <Wallet className="size-6 text-blue-600 " />
               </div>
-              <h3 className="mb-2 font-medium dark:text-white">
-                Connect Wallet
-              </h3>
-              <p className="text-sm text-muted-foreground dark:text-gray-400">
+              <h3 className="mb-2 font-medium ">Connect Wallet</h3>
+              <p className="text-sm text-muted-foreground ">
                 Connect your wallet to start renting or listing domains
               </p>
             </div>
             <div>
-              <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
-                <ShoppingBag className="size-6 text-green-600 dark:text-green-400" />
+              <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-green-100 ">
+                <ShoppingBag className="size-6 text-green-600 " />
               </div>
-              <h3 className="mb-2 font-medium dark:text-white">
-                Choose Option
-              </h3>
-              <p className="text-sm text-muted-foreground dark:text-gray-400">
+              <h3 className="mb-2 font-medium ">Choose Option</h3>
+              <p className="text-sm text-muted-foreground ">
                 Select whether you want to rent or list domains
               </p>
             </div>
             <div>
-              <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900">
-                <Tag className="size-6 text-purple-600 dark:text-purple-400" />
+              <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-purple-100 ">
+                <Tag className="size-6 text-purple-600 " />
               </div>
-              <h3 className="mb-2 font-medium dark:text-white">
-                Complete Transaction
-              </h3>
-              <p className="text-sm text-muted-foreground dark:text-gray-400">
+              <h3 className="mb-2 font-medium ">Complete Transaction</h3>
+              <p className="text-sm text-muted-foreground ">
                 Finalize your rental agreement or listing
               </p>
             </div>
