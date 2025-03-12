@@ -1,9 +1,9 @@
-import { useMemo, useState } from 'react';
-import { ApolloClient, InMemoryCache, gql } from '@apollo/react-hooks';
-import { Address, formatEther } from 'viem';
-import { useChainId } from 'wagmi';
-import { Domain } from '~~/types/types';
-import { getEnsRentGraphQL } from '~~/wagmi';
+import { useMemo, useState } from "react";
+import { ApolloClient, InMemoryCache, gql } from "@apollo/react-hooks";
+import { Address, formatEther } from "viem";
+import { useChainId } from "wagmi";
+import { Domain } from "~~/types/types";
+import { getEnsRentGraphQL } from "~~/wagmi";
 
 const oneYearInSeconds = 365 * 24 * 60 * 60;
 const pageSize = 15;
@@ -12,7 +12,7 @@ const calculateYearlyPrice = (pricePerSecond: string | number): bigint => {
 };
 
 export default function useAvailableDomains(
-  lender: Address | undefined
+  lender: Address | undefined,
 ): [
   (param?: string, orderBy?: string) => Promise<Domain[]>,
   (param?: string, orderBy?: string) => Promise<Domain[]>,
@@ -27,8 +27,7 @@ export default function useAvailableDomains(
   const [startCursorState, setStartCursorState] = useState<string | null>(null);
   const [endCursorState, setEndCursorState] = useState<string | null>(null);
   const [hasNextPageState, setHasNextPageState] = useState<boolean>(false);
-  const [hasPreviousPageState, setHasPreviousPageState] =
-    useState<boolean>(false);
+  const [hasPreviousPageState, setHasPreviousPageState] = useState<boolean>(false);
 
   const client = useMemo(
     () =>
@@ -36,7 +35,7 @@ export default function useAvailableDomains(
         uri: ensRentGraphQL,
         cache: new InMemoryCache(),
       }),
-    [ensRentGraphQL, chainId]
+    [ensRentGraphQL, chainId],
   );
 
   // Move the domain formatting logic to a separate function for reuse
@@ -44,25 +43,23 @@ export default function useAvailableDomains(
     let result: Domain[] = [];
 
     if (queryData?.listings?.items) {
-      const availableDomains = queryData.listings.items.map(
-        (listing: Domain) => {
-          const pricePerYear = calculateYearlyPrice(listing.price || 0);
-          const priceInEth = formatEther(pricePerYear);
+      const availableDomains = queryData.listings.items.map((listing: Domain) => {
+        const pricePerYear = calculateYearlyPrice(listing.price || 0);
+        const priceInEth = formatEther(pricePerYear);
 
-          return {
-            id: listing.id,
-            maxRentalTime: listing.maxRentalTime,
-            createdAt: listing.createdAt,
-            isWrapped: listing.isWrapped,
-            lender: listing.lender,
-            node: listing.node,
-            name: `${listing.name}.eth`,
-            price: priceInEth,
-            tokenId: listing.tokenId,
-            rentals: listing.rentals,
-          };
-        }
-      );
+        return {
+          id: listing.id,
+          maxRentalTime: listing.maxRentalTime,
+          createdAt: listing.createdAt,
+          isWrapped: listing.isWrapped,
+          lender: listing.lender,
+          node: listing.node,
+          name: `${listing.name}.eth`,
+          price: priceInEth,
+          tokenId: listing.tokenId,
+          rentals: listing.rentals,
+        };
+      });
 
       result = availableDomains.filter((domain: any) => {
         const lastRentEndTime = domain?.rentals?.items[0]?.endTime;
@@ -75,12 +72,12 @@ export default function useAvailableDomains(
 
   const getOrderByClause = (orderBy?: string) => {
     switch (orderBy) {
-      case 'price':
+      case "price":
         return 'orderBy: "price", orderDirection: "asc"';
-      case 'time':
+      case "time":
         return 'orderBy: "maxRentalTime", orderDirection: "desc"';
       default:
-        return '';
+        return "";
     }
   };
 
@@ -94,15 +91,10 @@ export default function useAvailableDomains(
     if (lender) whereConditions.push(`lender_not: "${lender}"`);
     if (param) whereConditions.push(`name_contains: "${param}"`);
 
-    return whereConditions.length
-      ? `where: {${whereConditions.join(', ')}}`
-      : 'where: {}';
+    return whereConditions.length ? `where: {${whereConditions.join(", ")}}` : "where: {}";
   };
 
-  const getInitialPage = async (
-    param?: string,
-    orderBy?: string
-  ): Promise<Domain[]> => {
+  const getInitialPage = async (param?: string, orderBy?: string): Promise<Domain[]> => {
     // Reset pagination state
     setStartCursorState(null);
     setEndCursorState(null);
@@ -156,11 +148,8 @@ export default function useAvailableDomains(
     return formatDomainsData(data);
   };
 
-  const getNextPage = async (
-    param?: string,
-    orderBy?: string
-  ): Promise<Domain[]> => {
-    const afterParam = endCursorState ? `, after: "${endCursorState}"` : '';
+  const getNextPage = async (param?: string, orderBy?: string): Promise<Domain[]> => {
+    const afterParam = endCursorState ? `, after: "${endCursorState}"` : "";
     const whereClause = getWhereClause(param);
     const orderByClause = getOrderByClause(orderBy);
 
@@ -209,13 +198,8 @@ export default function useAvailableDomains(
     return formatDomainsData(data);
   };
 
-  const getPreviousPage = async (
-    param?: string,
-    orderBy?: string
-  ): Promise<Domain[]> => {
-    const beforeParam = startCursorState
-      ? `, before: "${startCursorState}"`
-      : '';
+  const getPreviousPage = async (param?: string, orderBy?: string): Promise<Domain[]> => {
+    const beforeParam = startCursorState ? `, before: "${startCursorState}"` : "";
     const whereClause = getWhereClause(param);
     const orderByClause = getOrderByClause(orderBy);
 
@@ -264,11 +248,5 @@ export default function useAvailableDomains(
     return formatDomainsData(data);
   };
 
-  return [
-    getInitialPage,
-    getNextPage,
-    getPreviousPage,
-    hasNextPageState,
-    hasPreviousPageState,
-  ];
+  return [getInitialPage, getNextPage, getPreviousPage, hasNextPageState, hasPreviousPageState];
 }

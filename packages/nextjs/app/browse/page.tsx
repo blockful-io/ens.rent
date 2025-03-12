@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Clock, Search, TrendingDown } from 'lucide-react';
 import { formatEther } from 'viem';
-import { useAccount, useChainId } from 'wagmi';
-import { useCurrency } from '~~/contexts/CurrencyContext';
+import { useAccount, useChainId, useEnsName } from 'wagmi';
 import { Button } from '~~/components/old-dapp/ui/button';
 import {
   Card,
@@ -36,8 +35,6 @@ import useRentedDomains, {
 } from '~~/hooks/graphql/useRentedDomains';
 import { Domain } from '~~/types/types';
 import { EnsDappLink } from '~~/components/EnsDappLink';
-import { EthToUsdValue } from '~~/components/EthToUsdValue';
-import { SECONDS_PER_YEAR } from '~~/utils/old-dapp/utils';
 
 export default function Component() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -158,16 +155,6 @@ export default function Component() {
   const filteredDomains = availableDomains;
   const rentedFilteredDomains = rentedDomains;
 
-  const { ethPrice, preferredCurrency } = useCurrency();
-
-  const formatPrice = (priceInEth: number) => {
-    if (preferredCurrency === 'ETH') {
-      return `${priceInEth.toFixed(4)} ETH`;
-    }
-    const priceInUsd = priceInEth * ethPrice;
-    return `$${priceInUsd.toFixed(2)}`;
-  };
-
   const TableView = () => (
     <div className="flex flex-col gap-4">
       <div className="rounded-md border overflow-hidden">
@@ -190,7 +177,7 @@ export default function Component() {
                 <TableCell>
                   <div className="flex items-center">
                     <TrendingDown className="w-4 h-4 text-green-500 mr-2" />
-                    <EthToUsdValue ethAmount={domain.price || 0} />
+                    {domain.price} ETH
                   </div>
                 </TableCell>
                 <TableCell>
@@ -264,11 +251,7 @@ export default function Component() {
                 }
                 return (
                   <TableRow
-                    key={
-                      domain.listing.price +
-                      domain.listing.name +
-                      domain.startTime
-                    }
+                    key={domain?.listing?.id + '-rented-table-row'}
                     className={'bg-gray-100 hover:bg-gray-100'}
                   >
                     <TableCell className="font-medium">
@@ -277,14 +260,11 @@ export default function Component() {
                     <TableCell>
                       <div className="flex items-center">
                         <TrendingDown className="w-4 h-4 text-green-500 mr-2" />
-                        <EthToUsdValue
-                          ethAmount={Number(
-                            formatEther(
-                              BigInt(domain?.listing?.price || 0) *
-                                BigInt(SECONDS_PER_YEAR)
-                            )
-                          )}
-                        />
+                        {formatEther(
+                          BigInt(domain?.listing?.price || 0) *
+                            BigInt(365 * 24 * 60 * 60)
+                        )}
+                        ETH
                       </div>
                     </TableCell>
                     <TableCell>
@@ -351,7 +331,7 @@ export default function Component() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
       <div className="container mx-auto py-8 flex flex-col gap-4">
         <Card className="bg-white">
           <CardHeader>

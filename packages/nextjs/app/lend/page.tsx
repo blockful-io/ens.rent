@@ -38,7 +38,6 @@ import useDomainsByAddress from '~~/hooks/graphql/useDomains';
 import { getEnsRentAddress } from '~~/wagmi';
 import { getChainContractAddress } from '@ensdomains/ensjs/contracts';
 import { mainnet } from 'viem/chains';
-import { EthToUsdValue } from '~~/components/EthToUsdValue';
 
 const ONE_YEAR_IN_SECONDS = 31536000;
 
@@ -229,7 +228,7 @@ function LendPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-100 p-4 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="text-red-500">Error</CardTitle>
@@ -249,14 +248,14 @@ function LendPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 p-4 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 flex items-center justify-center">
         <Card className="w-full max-w-md bg-white">
           <CardHeader>
             <CardTitle>Loading...</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
             </div>
           </CardContent>
         </Card>
@@ -265,7 +264,7 @@ function LendPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
       <div className="container mx-auto py-8 max-w-4xl">
         <Card className="mx-auto w-full max-w-md bg-white">
           <CardHeader>
@@ -292,7 +291,7 @@ function LendPage() {
                   <p className="text-sm text-gray-500 mt-1">
                     {isCheckingApproval ? (
                       <span className="flex items-center">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 mr-2"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 dark:border-white mr-2"></div>
                         Checking approval status...
                       </span>
                     ) : isApproved ? (
@@ -321,8 +320,7 @@ function LendPage() {
                 />
                 {!!price && (
                   <p className="text-sm text-gray-500 mt-1">
-                    Price per second:{' '}
-                    <EthToUsdValue ethAmount={Number(pricePerSecond)} />
+                    Price per second: {formatEther(pricePerSecond)} ETH
                   </p>
                 )}
               </div>
