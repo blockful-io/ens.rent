@@ -1,12 +1,9 @@
-'use client';
-
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from './ui/button';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import toast from 'react-hot-toast';
 import { useAccount } from 'wagmi';
-import { CurrencyToggle } from '../CurrencyToggle';
 
 export function SiteHeader() {
   const { address } = useAccount();
@@ -44,7 +41,6 @@ export function SiteHeader() {
           {/* <nav className="flex items-center space-x-1">
             <ThemeToggle />
           </nav> */}
-          <CurrencyToggle />
           <nav className="flex items-center space-x-1">
             <ConnectButton />
           </nav>

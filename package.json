@@ -29,7 +29,7 @@
     "foundry:test": "npm run -w @se-2/foundry test",
     "foundry:verify": "npm run -w @se-2/foundry verify",
     "generate": "npm run foundry:generate",
-    "postinstall": "husky",
+    "postinstall": "husky install",
     "lint": "npm run nextjs:lint && npm run foundry:lint",
     "next:build": "npm run -w @se-2/nextjs build",
     "next:dev": "npm run -w @se-2/nextjs dev",
