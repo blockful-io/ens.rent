@@ -46,7 +46,7 @@ export default function DomainBuy() {
   const { unlistDomain, isUnlisting } = useUnlistDomain();
 
   const pricePerSecond = BigInt(listing?.price || 0);
-  const pricePerYear = pricePerSecond * BigInt(31536000); // 365 days in seconds
+  const pricePerYear = pricePerSecond * BigInt(31536000);
   const totalPrice = pricePerSecond * BigInt(Math.max(0, duration));
   const publicClient = usePublicClient();
   const ensRentAddress = getEnsRentAddress(publicClient?.chain.id || 1);
@@ -185,6 +185,8 @@ export default function DomainBuy() {
 
   const maxDate = new Date(Number(listing.maxRentalTime) * 1000);
 
+  console.log(listing);
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="mx-auto max-w-4xl space-y-6">
@@ -213,7 +215,9 @@ export default function DomainBuy() {
                     <Tag className="size-5 text-blue-500" />
                     <span className="text-lg font-medium">Price per Year</span>
                   </div>
-                  <EthToUsdValue ethAmount={Number(pricePerYear)} />
+                  <EthToUsdValue
+                    ethAmount={Number(formatEther(pricePerYear))}
+                  />
                 </div>
 
                 <div className="flex items-center justify-between rounded-lg bg-gray-50 p-4 ">
@@ -223,7 +227,9 @@ export default function DomainBuy() {
                       Price per Second
                     </span>
                   </div>
-                  <EthToUsdValue ethAmount={Number(pricePerSecond)} />
+                  <EthToUsdValue
+                    ethAmount={Number(formatEther(pricePerSecond))}
+                  />
                 </div>
 
                 {!isSeller && (
@@ -246,7 +252,7 @@ export default function DomainBuy() {
                       <input
                         type="date"
                         value={maxDate.toISOString().split('T')[0]}
-                        className="px-3 py-2 border rounded-md"
+                        className="px-3 py-2 border rounded-md bg-white"
                         disabled
                       />
                     </p>
@@ -257,7 +263,7 @@ export default function DomainBuy() {
                       min={minDate}
                       max={maxDate.toISOString().split('T')[0]}
                       onChange={handleDateChange}
-                      className="px-3 py-2 border rounded-md"
+                      className="px-3 py-2 border rounded-md bg-white"
                     />
                   )}
                 </div>
@@ -321,7 +327,9 @@ export default function DomainBuy() {
                     ) : (
                       <>
                         Rent Now for{' '}
-                        <EthToUsdValue ethAmount={Number(totalPrice)} />
+                        <EthToUsdValue
+                          ethAmount={Number(formatEther(totalPrice))}
+                        />
                       </>
                     )}
                   </Button>
