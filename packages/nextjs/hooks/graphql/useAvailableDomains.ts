@@ -64,7 +64,44 @@ export default function useAvailableDomains(
         }
       );
 
-      result = availableDomains.filter((domain: any) => {
+      // First sort rentals within each domain by endTime (most recent first)
+      const domainsWithSortedRentals = availableDomains.map((domain: any) => {
+        if (domain.rentals?.items?.length) {
+          return {
+            ...domain,
+            rentals: {
+              ...domain.rentals,
+              items: [...domain.rentals.items].sort(
+                (a, b) => Number(b.endTime || 0) - Number(a.endTime || 0)
+              ),
+            },
+          };
+        }
+        return domain;
+      });
+
+      // Then sort domains
+      const sortedDomains = domainsWithSortedRentals.sort((a: any, b: any) => {
+        // Sort by rental status first (domains without rentals come first)
+        if (!a.rentals?.items?.length && b.rentals?.items?.length) return -1;
+        if (a.rentals?.items?.length && !b.rentals?.items?.length) return 1;
+
+        // If both have rentals, sort by the most recent rental's end time
+        if (a.rentals?.items?.length && b.rentals?.items?.length) {
+          return (
+            Number(b.rentals.items[0]?.endTime || 0) -
+            Number(a.rentals.items[0]?.endTime || 0)
+          );
+        }
+
+        // Fall back to maxRentalTime if rental information is equivalent
+        return (
+          new Date(a.maxRentalTime).getTime() -
+          new Date(b.maxRentalTime).getTime()
+        );
+      });
+
+      result = sortedDomains.filter((domain: any) => {
         const lastRentEndTime = domain?.rentals?.items[0]?.endTime;
         return !lastRentEndTime || lastRentEndTime < Date.now() / 1000;
       });
