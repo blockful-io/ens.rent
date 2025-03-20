@@ -237,7 +237,9 @@ export default function DomainBuy() {
                       <Tag className="size-5 text-blue-500" />
                       <span className="text-lg font-medium">Total Price</span>
                     </div>
-                    <EthToUsdValue ethAmount={Number(totalPrice)} />
+                    <EthToUsdValue
+                      ethAmount={Number(formatEther(totalPrice))}
+                    />
                   </div>
                 )}
 
