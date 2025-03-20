@@ -308,6 +308,7 @@ function LendPage() {
                 <Input
                   id="startingPrice"
                   type="text"
+                  className="text-black bg-white"
                   value={price}
                   placeholder="0.01"
                   onChange={(e) => {
