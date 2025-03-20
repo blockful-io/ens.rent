@@ -55,7 +55,7 @@ export default function DomainBuy() {
   useEffect(() => {
     if (listing && connectedAccount) {
       setIsSeller(
-        connectedAccount.toLowerCase() === listing.lender.toLowerCase()
+        connectedAccount.toLowerCase() === listing?.lender?.toLowerCase()
       );
     }
   }, [listing, connectedAccount]);
@@ -184,7 +184,7 @@ export default function DomainBuy() {
   tomorrow.setDate(tomorrow.getDate() + 1);
   const minDate = tomorrow.toISOString().split('T')[0];
 
-  const maxDate = new Date(Number(listing.maxRentalTime) * 1000);
+  const maxDate = new Date(Number(listing?.maxRentalTime) * 1000);
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
@@ -351,7 +351,7 @@ export default function DomainBuy() {
                   <h2 className="mb-2 text-sm font-medium text-gray-500">
                     Listed by
                   </h2>
-                  <p className="font-medium">{listing.lender}</p>
+                  <p className="font-medium">{listing?.lender}</p>
                 </div>
               )}
             </div>
