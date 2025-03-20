@@ -185,7 +185,6 @@ export default function DomainBuy() {
 
   const maxDate = new Date(Number(listing.maxRentalTime) * 1000);
 
-  console.log(listing);
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
