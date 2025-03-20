@@ -25,6 +25,7 @@ import useDomainData from '~~/hooks/graphql/useDomainData';
 import { useUnlistDomain } from '~~/hooks/graphql/useUnlistDomain';
 import { getEnsRentAddress } from '~~/wagmi';
 import { EthToUsdValue } from '~~/components/EthToUsdValue';
+import { SECONDS_PER_YEAR } from '~~/utils/old-dapp/utils';
 
 export default function DomainBuy() {
   const router = useRouter();
@@ -46,7 +47,7 @@ export default function DomainBuy() {
   const { unlistDomain, isUnlisting } = useUnlistDomain();
 
   const pricePerSecond = BigInt(listing?.price || 0);
-  const pricePerYear = pricePerSecond * BigInt(31536000);
+  const pricePerYear = pricePerSecond * BigInt(SECONDS_PER_YEAR);
   const totalPrice = pricePerSecond * BigInt(Math.max(0, duration));
   const publicClient = usePublicClient();
   const ensRentAddress = getEnsRentAddress(publicClient?.chain.id || 1);
@@ -184,7 +185,6 @@ export default function DomainBuy() {
   const minDate = tomorrow.toISOString().split('T')[0];
 
   const maxDate = new Date(Number(listing.maxRentalTime) * 1000);
-
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
