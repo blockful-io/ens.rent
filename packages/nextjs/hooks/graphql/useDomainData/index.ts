@@ -24,7 +24,12 @@ export default function useDomainData(
 
   useEffect(() => {
     const fetchListings = async () => {
+      if (!address) {
+        return;
+      }
+
       setIsLoading(true);
+      setError(null);
 
       if (!domain) {
         setListing(null);
@@ -70,19 +75,19 @@ export default function useDomainData(
           return;
         }
 
-        const mostRecentRental = listingFromGraph.rentals?.items[0];
+        const mostRecentRental = listingFromGraph?.rentals?.items[0];
         const hasActiveRental =
-          listingFromGraph.rentals?.items.length > 0 &&
+          listingFromGraph?.rentals?.items?.length > 0 &&
           mostRecentRental?.endTime &&
           parseInt(mostRecentRental.endTime) > Math.floor(Date.now() / 1000);
 
         const status = determineRentalStatus(
-          listingFromGraph,
-          mostRecentRental,
+          listingFromGraph || null,
+          mostRecentRental || null,
           address
         );
 
-        const formattedRentals = listingFromGraph.rentals?.items.map(
+        const formattedRentals = listingFromGraph?.rentals?.items.map(
           (rental: any) => ({
             id: rental?.id,
             borrower: rental?.borrower,
@@ -92,11 +97,6 @@ export default function useDomainData(
           })
         );
 
-        // const formattedRentals = [
-        //   { id: '1', borrower: '0x', startTime: '1', endTime: '2', price: '3' },
-        // ];
-
-        console.log('last rental', new Date(formattedRentals[0]?.endTime));
         setListing({
           ...listingFromGraph,
           status,
