@@ -39,8 +39,7 @@ import { getEnsRentAddress } from '~~/wagmi';
 import { getChainContractAddress } from '@ensdomains/ensjs/contracts';
 import { mainnet } from 'viem/chains';
 import { EthToUsdValue } from '~~/components/EthToUsdValue';
-
-const ONE_YEAR_IN_SECONDS = 31536000;
+import { SECONDS_PER_YEAR } from '~~/utils/old-dapp/utils';
 
 function LendPage() {
   const router = useRouter();
@@ -61,7 +60,7 @@ function LendPage() {
   const [isCheckingApproval, setIsCheckingApproval] = useState(false);
 
   const pricePerSecond = price
-    ? parseEther(price) / BigInt(ONE_YEAR_IN_SECONDS)
+    ? parseEther(price) / BigInt(SECONDS_PER_YEAR)
     : BigInt(0);
 
   const baseRegistrarAddress = getChainContractAddress({
@@ -188,7 +187,7 @@ function LendPage() {
       const name = domainToList.split('.')[0];
       const tokenId = BigInt(labelhash(name));
 
-      const pricePerSecond = parseEther(price) / BigInt(ONE_YEAR_IN_SECONDS);
+      const pricePerSecond = parseEther(price) / BigInt(SECONDS_PER_YEAR);
       const maxEndTimestamp = BigInt(Math.floor(Date.now() / 1000) + duration);
 
       setCheckYourWallet(true);
@@ -308,6 +307,7 @@ function LendPage() {
                 <Input
                   id="startingPrice"
                   type="text"
+                  className="text-black bg-white"
                   value={price}
                   placeholder="0.01"
                   onChange={(e) => {
@@ -322,7 +322,9 @@ function LendPage() {
                 {!!price && (
                   <p className="text-sm text-gray-500 mt-1">
                     Price per second:{' '}
-                    <EthToUsdValue ethAmount={Number(pricePerSecond)} />
+                    <EthToUsdValue
+                      ethAmount={Number(formatEther(pricePerSecond))}
+                    />
                   </p>
                 )}
               </div>
