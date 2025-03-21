@@ -130,7 +130,7 @@ export default function useAvailableDomains(
               name
               price
               tokenId
-              rentals {
+              rentals(orderBy: "endTime", orderDirection: "DESC") {
                 items {
                   endTime
                   borrower
@@ -183,7 +183,7 @@ export default function useAvailableDomains(
               name
               price
               tokenId
-              rentals {
+              rentals(orderBy: "endTime", orderDirection: "DESC") {
                 items {
                   endTime
                   borrower
@@ -238,7 +238,7 @@ export default function useAvailableDomains(
               name
               price
               tokenId
-              rentals {
+              rentals(orderBy: "endTime", orderDirection: "DESC") {
                 items {
                   endTime
                   borrower
