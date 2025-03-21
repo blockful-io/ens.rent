@@ -76,6 +76,8 @@ export default function RentedDomainDetails() {
     );
   }
 
+  const endTime = rental.rentals?.[0]?.endTime;
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="container mx-auto py-8 max-w-4xl space-y-6">
@@ -134,9 +136,7 @@ export default function RentedDomainDetails() {
                     <span>Time Remaining</span>
                   </div>
                   <div className="text-2xl font-bold">
-                    {rental.maxRentalTime
-                      ? getRemainingTime(rental.maxRentalTime)
-                      : '-'}
+                    {endTime ? getRemainingTime(endTime.toString()) : '-'}
                   </div>
                 </div>
               </div>
@@ -259,7 +259,7 @@ const formatDate = (date: number): string => {
 
 const getRemainingTime = (endDate: string) => {
   const now = new Date();
-  const end = new Date(parseInt(endDate) * 1000);
+  const end = new Date(parseInt(endDate));
   const diff = end.getTime() - now.getTime();
 
   // Return early if already expired
