@@ -23,6 +23,7 @@ export function determineRentalStatus(
   address?: string
 ): RentalStatus {
   const now = Math.floor(Date.now() / 1000);
+
   const rentalExpiry = mostRecentRental?.endTime
     ? parseInt(mostRecentRental.endTime)
     : 0;
@@ -31,6 +32,8 @@ export function determineRentalStatus(
     return RentalStatus.rentedOut;
   } else if (mostRecentRental?.borrower === address && rentalExpiry > now) {
     return RentalStatus.rentedIn;
+  } else if (rentalExpiry < now) {
+    return RentalStatus.expired;
   } else {
     return RentalStatus.listed;
   }
