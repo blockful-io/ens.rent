@@ -55,7 +55,7 @@ export default function DomainBuy() {
   useEffect(() => {
     if (listing && connectedAccount) {
       setIsSeller(
-        connectedAccount.toLowerCase() === listing?.lender?.toLowerCase()
+        connectedAccount.toLowerCase() === listing.lender.toLowerCase()
       );
     }
   }, [listing, connectedAccount]);
