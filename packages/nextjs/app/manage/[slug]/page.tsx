@@ -76,7 +76,7 @@ export default function RentedDomainDetails() {
     );
   }
 
-  const endTime = rental.rentals?.[0]?.endTime;
+  const endTime = rental.rentals?.[0].endTime;
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
@@ -233,16 +233,18 @@ export default function RentedDomainDetails() {
               <ExternalLink className="w-4 h-4" />
               View on Etherscan
             </Button>
-            <Button asChild>
-              <Link
-                className="flex items-center gap-2"
-                target="_blank"
-                href={`https://app.ens.domains/${domain}`}
-              >
-                <ExternalLink className="w-4 h-4" />
-                Manage your rented domain
-              </Link>
-            </Button>
+            {rental.status === RentalStatus.rentedIn && (
+              <Button asChild>
+                <Link
+                  className="flex items-center gap-2"
+                  target="_blank"
+                  href={`https://app.ens.domains/${domain}`}
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Manage your rented domain
+                </Link>
+              </Button>
+            )}
           </CardFooter>
         </Card>
       </div>
